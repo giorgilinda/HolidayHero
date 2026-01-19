@@ -70,6 +70,73 @@ export const VacationCalendar = () => {
     loadOverrides();
   }, []);
 
+  // Auto-generate overrides for school holidays with leon and lena
+  // Only when school is closed but it's NOT a public holiday
+  useEffect(() => {
+    if (!holidaysData || !isOverridesLoaded) return;
+
+    setManualOverrides(prev => {
+      const newOverrides = new Map(prev);
+      let hasChanges = false;
+
+      // Create a set of public holiday dates for quick lookup
+      const publicHolidayDates = new Set<string>();
+      holidaysData.publicHolidays.forEach((holiday) => {
+        const startDate = new Date(holiday.startDate);
+        const endDate = new Date(holiday.endDate);
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          publicHolidayDates.add(dateStr);
+        }
+      });
+
+      // Process school holidays to add default activity overrides
+      // But only if it's NOT a public holiday
+      holidaysData.schoolHolidays.forEach((holiday) => {
+        const startDate = new Date(holiday.startDate);
+        const endDate = new Date(holiday.endDate);
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+
+          // Skip if it's a public holiday
+          if (publicHolidayDates.has(dateStr)) {
+            continue;
+          }
+
+          const existing = newOverrides.get(dateStr);
+          const newOverride: ManualOverride = existing || {
+            date: dateStr,
+            people: {},
+          };
+
+          // Only add leon and lena if they're not already set
+          if (!newOverride.people['leon']) {
+            newOverride.people['leon'] = 'activity';
+            hasChanges = true;
+          }
+          if (!newOverride.people['lena']) {
+            newOverride.people['lena'] = 'activity';
+            hasChanges = true;
+          }
+
+          // Only update if there were changes
+          if (hasChanges || !existing) {
+            newOverrides.set(dateStr, newOverride);
+          }
+        }
+      });
+
+      return hasChanges ? newOverrides : prev;
+    });
+  }, [holidaysData, isOverridesLoaded]);
+
   // Save manual overrides to API whenever they change (but not on initial load)
   useEffect(() => {
     if (!isOverridesLoaded) return; // Don't save until we've loaded initial data
@@ -301,7 +368,7 @@ export const VacationCalendar = () => {
       }
     }
 
-    // Apply manual overrides
+    // Apply manual overrides (including auto-generated ones for school holidays)
     manualOverrides.forEach((override, dateStr) => {
       const existing = map.get(dateStr);
       if (existing) {
@@ -507,7 +574,10 @@ export const VacationCalendar = () => {
                   !isCurrentMonth && styles.otherMonth,
                   isToday && styles.today,
                   calendarDay.rating && styles[calendarDay.rating.tag],
-                  calendarDay.dayData?.manualOverride && styles.manualOverride
+                  calendarDay.dayData?.manualOverride && styles.manualOverride,
+                  calendarDay.dayData?.manualOverride && 
+                    Object.values(calendarDay.dayData.manualOverride.people).includes('activity') &&
+                    styles.manualOverrideActivity
                 )}
                 onClick={() => handleDayClick(calendarDay.date)}
                 style={{ cursor: 'pointer' }}
@@ -527,11 +597,15 @@ export const VacationCalendar = () => {
                         {Object.entries(calendarDay.dayData.manualOverride.people).map(([personId, type]) => {
                           const person = people.find(p => p.id === personId);
                           if (!person) return null;
+                          const icon = type === 'vacation' ? '🏖️' : type === 'wfh' ? '🏠' : '🎨';
                           return (
-                            <div key={personId} className={styles.manualOverridePerson}>
+                            <div key={personId} className={classNames(
+                              styles.manualOverridePerson,
+                              type === 'activity' && styles.manualOverridePersonActivity
+                            )}>
                               <span className={styles.manualOverridePersonName}>{person.name}:</span>
                               <span className={styles.manualOverridePersonType}>
-                                {type === 'vacation' ? '🏖️' : '🏠'}
+                                {icon}
                               </span>
                             </div>
                           );

@@ -131,6 +131,22 @@
   font-weight: 500;
 }
 
+.typeButtonActivity {
+  border-color: #ffc107;
+}
+
+.typeButtonActivity:hover {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+}
+
+.typeButtonActivityActive {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: 500;
+}
+
 .removeButton {
   padding: 8px 12px;
   border: 2px solid #ea4335;

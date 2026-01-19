@@ -6,7 +6,7 @@ const OVERRIDES_FILE = path.join(process.cwd(), 'src/data/manualOverrides.json')
 
 type Override = {
   date: string;
-  people: Record<string, 'vacation' | 'wfh'>; // Map of person ID to type
+  people: Record<string, 'vacation' | 'wfh' | 'activity'>; // Map of person ID to type
 };
 
 type OverridesData = {

@@ -11,7 +11,7 @@ export interface Person {
 
 export interface ManualOverride {
   date: string;
-  people: Record<string, 'vacation' | 'wfh'>; // Map of person ID to type
+  people: Record<string, 'vacation' | 'wfh' | 'activity'>; // Map of person ID to type
 }
 
 interface DayEditDialogProps {
@@ -33,7 +33,7 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
   onSave,
   onDelete,
 }) => {
-  const [peopleTypes, setPeopleTypes] = useState<Record<string, 'vacation' | 'wfh'>>({});
+  const [peopleTypes, setPeopleTypes] = useState<Record<string, 'vacation' | 'wfh' | 'activity'>>({});
 
   useEffect(() => {
     if (isOpen && existingOverride) {
@@ -58,7 +58,7 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
     day: 'numeric' 
   });
 
-  const handlePersonToggle = (personId: string, type: 'vacation' | 'wfh') => {
+  const handlePersonToggle = (personId: string, type: 'vacation' | 'wfh' | 'activity') => {
     setPeopleTypes(prev => {
       const newTypes = { ...prev };
       if (newTypes[personId] === type) {
@@ -132,6 +132,17 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
                         onClick={() => handlePersonToggle(person.id, 'wfh')}
                       >
                         🏠 WFH
+                      </button>
+                      <button
+                        type="button"
+                        className={classNames(
+                          styles.typeButton,
+                          styles.typeButtonActivity,
+                          currentType === 'activity' && styles.typeButtonActivityActive
+                        )}
+                        onClick={() => handlePersonToggle(person.id, 'activity')}
+                      >
+                        🎨 Activity
                       </button>
                       {currentType && (
                         <button

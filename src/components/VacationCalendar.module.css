@@ -11,6 +11,8 @@
     --text-secondary: #70757a;
     --manual-override: #d4edda;
     --manual-override-border: #28a745;
+    --manual-override-activity: #fff3cd;
+    --manual-override-activity-border: #ffc107;
 
     padding: 20px;
     font-family: 'Google Sans', Roboto, Arial, sans-serif;
@@ -95,6 +97,11 @@
     border: 2px solid var(--manual-override-border) !important;
 }
 
+.manualOverrideActivity {
+    background-color: var(--manual-override-activity) !important;
+    border: 2px solid var(--manual-override-activity-border) !important;
+}
+
 .manualOverrideInfo {
     margin-bottom: 4px;
     font-size: 10px;
@@ -119,6 +126,10 @@
 
 .manualOverridePersonType {
     font-size: 10px;
+}
+
+.manualOverridePersonActivity {
+    color: #856404;
 }
 
 .dayCell {

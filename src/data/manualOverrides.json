@@ -1,3 +1,221 @@
 {
-  "overrides": []
+  "overrides": [
+    {
+      "date": "2025-12-22",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-23",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-24",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-27",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-28",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-29",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-30",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-31",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-01-02",
+      "people": {
+        "mom": "vacation",
+        "dad": "vacation"
+      }
+    },
+    {
+      "date": "2026-01-03",
+      "people": {
+        "mom": "vacation",
+        "dad": "vacation"
+      }
+    },
+    {
+      "date": "2026-01-04",
+      "people": {
+        "mom": "vacation",
+        "dad": "vacation"
+      }
+    },
+    {
+      "date": "2026-01-05",
+      "people": {
+        "mom": "vacation",
+        "dad": "vacation"
+      }
+    },
+    {
+      "date": "2025-12-25",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2025-12-26",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-02-16",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-02-17",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-02-18",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-02-19",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-03-30",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-03-31",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-01",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-02",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-03",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-04",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-05",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-06",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-07",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-08",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-09",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-04-10",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    },
+    {
+      "date": "2026-02-20",
+      "people": {
+        "leon": "activity",
+        "lena": "activity"
+      }
+    }
+  ]
 }
