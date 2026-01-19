@@ -419,6 +419,12 @@ export const VacationCalendar = () => {
     }
   };
 
+  const goToCurrentMonth = () => {
+    const now = new Date();
+    setCurrentMonth(now.getMonth());
+    setCurrentYear(now.getFullYear());
+  };
+
   // Format month string for display
   const monthString = useMemo(() => {
     const date = new Date(currentYear, currentMonth, 1);
@@ -534,19 +540,30 @@ export const VacationCalendar = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <button 
-          className={styles.navButton}
+          className={classNames(styles.navButton, styles.arrow)}
           onClick={goToPreviousMonth}
           aria-label="Previous month"
           disabled={isLoadingHolidays}
         >
           ‹
         </button>
-        <h2 className={styles.monthTitle}>
-          {monthString}
-          {isLoadingHolidays && <span style={{ fontSize: '0.6em', marginLeft: '8px' }}>Loading...</span>}
-        </h2>
+        <div className={styles.monthTitleContainer}>
         <button 
-          className={styles.navButton}
+            className={styles.navButton}
+            onClick={goToCurrentMonth}
+            aria-label="Go to current month"
+            disabled={isLoadingHolidays}
+            title="Go to current month"
+          >
+            Today
+          </button>
+          <h2 className={styles.monthTitle}>
+            {monthString}
+            {isLoadingHolidays && <span style={{ fontSize: '0.6em', marginLeft: '8px' }}>Loading...</span>}
+          </h2>
+        </div>
+        <button 
+          className={classNames(styles.navButton, styles.arrow)}
           onClick={goToNextMonth}
           aria-label="Next month"
           disabled={isLoadingHolidays}
