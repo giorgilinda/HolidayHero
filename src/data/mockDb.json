@@ -1,0 +1,26 @@
+{
+  "month": "May 2026",
+  "days": [
+    { "date": "2026-05-01", "holidayName": "May Day", "isPublicHoliday": true, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": true, "wfhAbility": 1.0 },
+    { "date": "2026-05-04", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-05", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-06", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-07", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.0 },
+    { "date": "2026-05-08", "holidayName": "Friday Bridge", "isPublicHoliday": false, "isBridgeDay": true, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.0 },
+    { "date": "2026-05-11", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-12", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-13", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-14", "holidayName": "Ascension Day", "isPublicHoliday": true, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": true, "wfhAbility": 1.0 },
+    { "date": "2026-05-15", "holidayName": "The Big Bridge", "isPublicHoliday": false, "isBridgeDay": true, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 0.0 },
+    { "date": "2026-05-18", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-19", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-20", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-21", "holidayName": null, "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "open", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-22", "holidayName": "School Inset Day", "isPublicHoliday": false, "isBridgeDay": true, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 1.0 },
+    { "date": "2026-05-25", "holidayName": "Spring Bank Holiday", "isPublicHoliday": true, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": true, "wfhAbility": 1.0 },
+    { "date": "2026-05-26", "holidayName": "Half Term", "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-27", "holidayName": "Half Term", "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-28", "holidayName": "Half Term", "isPublicHoliday": false, "isBridgeDay": false, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 0.5 },
+    { "date": "2026-05-29", "holidayName": "Half Term", "isPublicHoliday": false, "isBridgeDay": true, "schoolStatus": "closed", "spouseAvailable": false, "wfhAbility": 0.5 }
+  ]
+}

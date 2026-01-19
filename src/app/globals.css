@@ -5,6 +5,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  /* Mobile viewport fixes */
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -18,8 +19,10 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Mobile-specific improvements */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  /* Safe area support for mobile devices */
   padding-top: var(--mobile-safe-area-top);
   padding-bottom: var(--mobile-safe-area-bottom);
   padding-left: var(--mobile-safe-area-left);
@@ -57,6 +60,7 @@ button,
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
+  /* Mobile touch improvements */
   min-height: var(--mobile-touch-target);
   min-width: var(--mobile-touch-target);
   -webkit-tap-highlight-color: transparent;
