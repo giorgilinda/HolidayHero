@@ -638,9 +638,6 @@ export const VacationCalendar = () => {
                     <div className={styles.recommendation}>
                       {calendarDay.rating.recommendation}
                     </div>
-                    {calendarDay.rating.score > 0 && (
-                      <div className={styles.score}>Score: {calendarDay.rating.score}</div>
-                    )}
                   </div>
                 )}
               </div>

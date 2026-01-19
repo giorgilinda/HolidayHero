@@ -43,7 +43,7 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
   if (isSchoolHoliday) {
     // School holidays are always mandatory, regardless of spouse/wfh status
     score = 10;
-    recommendation = "Mandatory PTO: School is closed.";
+    recommendation = "School is closed.";
     tag = 'MANDATORY';
     return { score, recommendation, tag };
   }
@@ -52,7 +52,7 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
   // Bridge days are only valuable if school is open (no childcare needed)
   if (ctx.isBridgeDay && ctx.schoolStatus === 'open') {
     score = Math.max(score, 8); // High value because it creates a 4-day break
-    recommendation = "High Efficiency: Great day to take PTO for a long weekend.";
+    recommendation = "Great day for a bridge-day";
     tag = 'HIGH_VALUE';
   }
 
@@ -60,7 +60,7 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
   // Standard work days (school open, not a bridge day)
   if (ctx.schoolStatus === 'open' && !ctx.isBridgeDay) {
     score = 2;
-    recommendation = "Standard Work Day";
+    recommendation = "";
     tag = 'WORK';
   }
 
