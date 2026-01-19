@@ -1,6 +1,13 @@
-# Next.js Boilerplate
+HolidayHero 🏖️
 
-A modern, production-ready Next.js boilerplate with TypeScript, Jest, ESLint, and comprehensive developer tools. Perfect for quickly starting new projects, code challenges, and personal applications.
+A smart vacation planning engine that balances local holidays, 
+school closures, and WFH flexibility to find the best days for PTO.
+
+## Key Features
+- **The Brain**: TypeScript logic to rate days from 1-10.
+- **Childcare Guard**: Automatically flags days where school is closed.
+- **Bridge Finder**: Detects high-efficiency days (1 PTO = 4 Day Weekend).
+- **Spouse Sync**: Real-time coordination via Supabase.
 
 ## 🚀 Features
 
