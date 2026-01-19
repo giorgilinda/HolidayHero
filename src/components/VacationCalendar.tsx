@@ -10,6 +10,13 @@ import { userPreferences } from '@/config/userPreferences';
 import { DayEditDialog, type ManualOverride, type Person } from './DayEditDialog';
 import peopleConfig from '@/config/people.json';
 
+// Type for people config with isChild property
+interface PersonConfig {
+  id: string;
+  name: string;
+  isChild?: boolean;
+}
+
 interface DayData {
   date: string;
   holidayName?: string | null;
@@ -44,7 +51,7 @@ export const VacationCalendar = () => {
   const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [people] = useState<Person[]>(peopleConfig.people);
+  const [people] = useState<Person[]>(peopleConfig.people as PersonConfig[]);
 
   // Load manual overrides from API on mount
   useEffect(() => {
@@ -116,15 +123,14 @@ export const VacationCalendar = () => {
             people: {},
           };
 
-          // Only add leon and lena if they're not already set
-          if (!newOverride.people['leon']) {
-            newOverride.people['leon'] = 'activity';
-            hasChanges = true;
-          }
-          if (!newOverride.people['lena']) {
-            newOverride.people['lena'] = 'activity';
-            hasChanges = true;
-          }
+          // Add all children to activity if they're not already set
+          const children = people.filter((p: PersonConfig) => p.isChild === true);
+          children.forEach((child: PersonConfig) => {
+            if (!newOverride.people[child.id]) {
+              newOverride.people[child.id] = 'activity';
+              hasChanges = true;
+            }
+          });
 
           // Only update if there were changes
           if (hasChanges || !existing) {
@@ -135,7 +141,7 @@ export const VacationCalendar = () => {
 
       return hasChanges ? newOverrides : prev;
     });
-  }, [holidaysData, isOverridesLoaded]);
+  }, [holidaysData, isOverridesLoaded, people]);
 
   // Save manual overrides to API whenever they change (but not on initial load)
   useEffect(() => {

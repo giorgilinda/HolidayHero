@@ -7,6 +7,7 @@ import styles from './DayEditDialog.module.css';
 export interface Person {
   id: string;
   name: string;
+  isChild?: boolean;
 }
 
 export interface ManualOverride {

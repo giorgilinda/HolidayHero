@@ -2,19 +2,23 @@
   "people": [
     {
       "id": "mom",
-      "name": "Linda"
+      "name": "Linda",
+      "isChild": false
     },
     {
       "id": "dad",
-      "name": "Marco"
+      "name": "Marco",
+      "isChild": false
     },
     {
       "id": "leon",
-      "name": "Leon"
+      "name": "Leon",
+      "isChild": true
     },
     {
       "id": "lena",
-      "name": "Lena"
+      "name": "Lena",
+      "isChild": true
     }
   ]
 }
