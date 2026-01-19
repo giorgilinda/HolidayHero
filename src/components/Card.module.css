@@ -1,0 +1,17 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.title {
+  margin: 0 0 var(--space-md) 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
