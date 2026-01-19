@@ -1,0 +1,13 @@
+{
+  "people": [
+    {
+      "id": "mom",
+      "name": "Linda"
+    },
+    {
+      "id": "dad",
+      "name": "Marco"
+    }
+  ]
+}
+

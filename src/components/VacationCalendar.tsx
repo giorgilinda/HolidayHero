@@ -7,6 +7,8 @@ import { calculateDayRating, DayContext } from '@/utils/brain';
 import { fetchAllHolidays, getHolidayName, type PublicHoliday, type SchoolHoliday } from '@/services/openHolidaysApi';
 import { HOLIDAY_COUNTRY_CODE, HOLIDAY_LANGUAGE_CODE, HOLIDAY_SUBDIVISION_CODE } from '@/utils/constants';
 import { userPreferences } from '@/config/userPreferences';
+import { DayEditDialog, type ManualOverride, type Person } from './DayEditDialog';
+import peopleConfig from '@/config/people.json';
 
 interface DayData {
   date: string;
@@ -16,6 +18,7 @@ interface DayData {
   schoolStatus: 'open' | 'closed' | 'half-day';
   spouseAvailable: boolean;
   wfhAbility: number;
+  manualOverride?: ManualOverride;
 }
 
 export const VacationCalendar = () => {
@@ -35,6 +38,62 @@ export const VacationCalendar = () => {
   } | null>(null);
   const [isLoadingHolidays, setIsLoadingHolidays] = useState(false);
   const [holidaysError, setHolidaysError] = useState<string | null>(null);
+
+  // State for manual overrides
+  const [manualOverrides, setManualOverrides] = useState<Map<string, ManualOverride>>(new Map());
+  const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [people] = useState<Person[]>(peopleConfig.people);
+
+  // Load manual overrides from API on mount
+  useEffect(() => {
+    const loadOverrides = async () => {
+      try {
+        const response = await fetch('/api/overrides');
+        if (response.ok) {
+          const data = await response.json();
+          const overrideMap = new Map<string, ManualOverride>();
+          if (data.overrides && Array.isArray(data.overrides)) {
+            data.overrides.forEach((override: ManualOverride) => {
+              overrideMap.set(override.date, override);
+            });
+          }
+          setManualOverrides(overrideMap);
+          setIsOverridesLoaded(true);
+        }
+      } catch (error) {
+        console.error('Failed to load manual overrides:', error);
+        setIsOverridesLoaded(true);
+      }
+    };
+    loadOverrides();
+  }, []);
+
+  // Save manual overrides to API whenever they change (but not on initial load)
+  useEffect(() => {
+    if (!isOverridesLoaded) return; // Don't save until we've loaded initial data
+    
+    const saveOverrides = async () => {
+      try {
+        const overridesArray = Array.from(manualOverrides.values());
+        const response = await fetch('/api/overrides', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ overrides: overridesArray }),
+        });
+        if (!response.ok) {
+          console.error('Failed to save overrides to file');
+        }
+      } catch (error) {
+        console.error('Failed to save manual overrides:', error);
+      }
+    };
+    
+    saveOverrides();
+  }, [manualOverrides, isOverridesLoaded]);
 
   // Fetch holidays when month/year changes
   useEffect(() => {
@@ -242,8 +301,31 @@ export const VacationCalendar = () => {
       }
     }
 
+    // Apply manual overrides
+    manualOverrides.forEach((override, dateStr) => {
+      const existing = map.get(dateStr);
+      if (existing) {
+        map.set(dateStr, {
+          ...existing,
+          manualOverride: override,
+        });
+      } else {
+        // Create day data for manual override if it doesn't exist
+        map.set(dateStr, {
+          date: dateStr,
+          holidayName: undefined,
+          isPublicHoliday: false,
+          isBridgeDay: false,
+          schoolStatus: 'open',
+          spouseAvailable: userPreferences.spouseAvailable,
+          wfhAbility: userPreferences.wfhAbility,
+          manualOverride: override,
+        });
+      }
+    });
+
     return map;
-  }, [holidaysData, currentMonth, currentYear]);
+  }, [holidaysData, currentMonth, currentYear, manualOverrides]);
 
   // Navigation functions
   const goToPreviousMonth = () => {
@@ -269,6 +351,45 @@ export const VacationCalendar = () => {
     const date = new Date(currentYear, currentMonth, 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }, [currentMonth, currentYear]);
+
+  // Dialog handlers
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setDialogOpen(true);
+  };
+
+  const handleSaveOverride = (override: ManualOverride) => {
+    setManualOverrides(prev => {
+      const newMap = new Map(prev);
+      newMap.set(override.date, override);
+      return newMap;
+    });
+  };
+
+  const handleDeleteOverride = () => {
+    if (selectedDate) {
+      // Format date as YYYY-MM-DD to match calendar format (using local timezone)
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      setManualOverrides(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(dateStr);
+        return newMap;
+      });
+    }
+  };
+
+  const getSelectedDateOverride = (): ManualOverride | null => {
+    if (!selectedDate) return null;
+    // Format date as YYYY-MM-DD to match calendar format (using local timezone)
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    return manualOverrides.get(dateStr) || null;
+  };
 
   const monthIndex = currentMonth;
   const yearNum = currentYear;
@@ -385,8 +506,11 @@ export const VacationCalendar = () => {
                   styles.dayCell,
                   !isCurrentMonth && styles.otherMonth,
                   isToday && styles.today,
-                  calendarDay.rating && styles[calendarDay.rating.tag]
+                  calendarDay.rating && styles[calendarDay.rating.tag],
+                  calendarDay.dayData?.manualOverride && styles.manualOverride
                 )}
+                onClick={() => handleDayClick(calendarDay.date)}
+                style={{ cursor: 'pointer' }}
               >
                 <div className={styles.dayNumber}>
                   {calendarDay.date.getDate()}
@@ -396,6 +520,22 @@ export const VacationCalendar = () => {
                     {calendarDay.dayData?.holidayName && (
                       <div className={styles.holidayName}>
                         {calendarDay.dayData.holidayName}
+                      </div>
+                    )}
+                    {calendarDay.dayData?.manualOverride && (
+                      <div className={styles.manualOverrideInfo}>
+                        {Object.entries(calendarDay.dayData.manualOverride.people).map(([personId, type]) => {
+                          const person = people.find(p => p.id === personId);
+                          if (!person) return null;
+                          return (
+                            <div key={personId} className={styles.manualOverridePerson}>
+                              <span className={styles.manualOverridePersonName}>{person.name}:</span>
+                              <span className={styles.manualOverridePersonType}>
+                                {type === 'vacation' ? '🏖️' : '🏠'}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                     <div className={styles.recommendation}>
@@ -411,6 +551,15 @@ export const VacationCalendar = () => {
           })}
         </div>
       </div>
+      <DayEditDialog
+        isOpen={dialogOpen}
+        date={selectedDate}
+        people={people}
+        existingOverride={getSelectedDateOverride()}
+        onClose={() => setDialogOpen(false)}
+        onSave={handleSaveOverride}
+        onDelete={handleDeleteOverride}
+      />
     </div>
   );
 };

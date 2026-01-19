@@ -37,32 +37,28 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
     return { score: 0, recommendation: "Public Holiday: Enjoy your day off!", tag: 'SKIP' };
   }
 
-  // 2. CHILDCARE NECESSITY (The "Must Stay Home" Factor)
-  const needsChildcare = (ctx.schoolStatus === 'closed' || ctx.schoolStatus === 'half-day');
+  // 2. SCHOOL HOLIDAYS: If school is closed (school holiday), it's mandatory PTO
+  const isSchoolHoliday = (ctx.schoolStatus === 'closed' || ctx.schoolStatus === 'half-day');
   
-  if (needsChildcare && !ctx.spouseAvailable) {
-    if (ctx.wfhAbility === 0) {
-      // Hard Constraint: School closed, can't work from home, spouse busy.
-      score = 10;
-      recommendation = "Mandatory PTO: School is closed and you cannot WFH.";
-      tag = 'MANDATORY';
-    } else if (ctx.wfhAbility > 0 && ctx.wfhAbility < 1) {
-      // Soft Constraint: Can WFH, but it's hard with kids.
-      score = 7;
-      recommendation = "WFH Recommended: School is closed, but you have WFH flexibility.";
-      tag = 'WFH_CANDIDATE';
-    }
+  if (isSchoolHoliday) {
+    // School holidays are always mandatory, regardless of spouse/wfh status
+    score = 10;
+    recommendation = "Mandatory PTO: School is closed.";
+    tag = 'MANDATORY';
+    return { score, recommendation, tag };
   }
 
   // 3. EFFICIENCY (The "Long Weekend" Factor)
-  if (ctx.isBridgeDay && !needsChildcare) {
+  // Bridge days are only valuable if school is open (no childcare needed)
+  if (ctx.isBridgeDay && ctx.schoolStatus === 'open') {
     score = Math.max(score, 8); // High value because it creates a 4-day break
     recommendation = "High Efficiency: Great day to take PTO for a long weekend.";
     tag = 'HIGH_VALUE';
   }
 
   // 4. LOW VALUE (The "Isolated Day" Factor)
-  if (!needsChildcare && !ctx.isBridgeDay) {
+  // Standard work days (school open, not a bridge day)
+  if (ctx.schoolStatus === 'open' && !ctx.isBridgeDay) {
     score = 2;
     recommendation = "Standard Work Day";
     tag = 'WORK';

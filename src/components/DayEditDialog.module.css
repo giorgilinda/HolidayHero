@@ -1,0 +1,204 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3c4043;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #70757a;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #f1f3f4;
+}
+
+.content {
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #3c4043;
+  font-size: 14px;
+}
+
+.peopleList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.personRow:hover {
+  border-color: #1a73e8;
+  background-color: #f8f9fa;
+}
+
+.personName {
+  font-weight: 500;
+  color: #3c4043;
+  flex: 1;
+}
+
+.personTypeButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.typeButton {
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  color: #3c4043;
+}
+
+.typeButton:hover {
+  border-color: #1a73e8;
+  background-color: #f8f9fa;
+}
+
+.typeButtonActive {
+  border-color: #1a73e8;
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.removeButton {
+  padding: 8px 12px;
+  border: 2px solid #ea4335;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ea4335;
+  transition: all 0.2s;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.removeButton:hover {
+  background-color: #fce8e6;
+  border-color: #c5221f;
+  color: #c5221f;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.cancelButton,
+.saveButton,
+.deleteButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cancelButton {
+  background-color: #f1f3f4;
+  color: #3c4043;
+}
+
+.cancelButton:hover {
+  background-color: #e8eaed;
+}
+
+.saveButton {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #1557b0;
+}
+
+.deleteButton {
+  background-color: #ea4335;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #c5221f;
+}
+
