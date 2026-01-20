@@ -7,6 +7,14 @@
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+    min-height: auto;
+    justify-content: flex-start;
+  }
+}
+
 .main {
   padding: 5rem 0;
   flex: 1;

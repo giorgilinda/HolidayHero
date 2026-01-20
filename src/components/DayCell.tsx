@@ -45,7 +45,7 @@ export const DayCell: React.FC<DayCellProps> = ({
       onClick={isValidDay ? onClick : undefined}
       style={{ cursor: isValidDay ? 'pointer' : 'default' }}
     >
-      {isValidDay && (
+      {isValidDay ? (
         <>
           <div className={dayCellStyles.dayNumber}>
             {calendarDay.date.getDate()}
@@ -91,7 +91,7 @@ export const DayCell: React.FC<DayCellProps> = ({
             </div>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 };

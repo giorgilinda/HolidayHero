@@ -18,6 +18,7 @@
     font-family: 'Google Sans', Roboto, Arial, sans-serif;
     max-width: 1200px;
     margin: 0 auto;
+    background-color: #ffffff;
 }
 
 .container:has(.yearlyCalendar) {
@@ -91,14 +92,16 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     .container {
-        padding: 8px;
+        padding: 10px 5px;
         max-width: 100%;
+        margin: 0;
     }
 
     .header {
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
+        padding: 0 5px;
     }
 
     .monthTitleContainer {
@@ -128,12 +131,14 @@
 
 @media (max-width: 480px) {
     .container {
-        padding: 4px;
+        padding: 5px;
+        margin: 0;
     }
 
     .header {
         gap: 4px;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+        padding: 0 5px;
     }
 
     .monthTitle {

@@ -7,14 +7,15 @@ import { CalendarViewProps, CalendarDay, PersonConfig } from './calendarTypes';
 import { calculateDayRating, DayContext } from '@/utils/brain';
 import { userPreferences } from '@/config/userPreferences';
 
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+
 export const YearlyView: React.FC<CalendarViewProps> = ({
   currentYear,
   dayDataMap,
   people,
   onDayClick,
 }) => {
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                      'July', 'August', 'September', 'October', 'November', 'December'];
 
   const yearlyCalendarData = useMemo(() => {
     const months: Array<{
@@ -22,6 +23,12 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
       monthName: string;
       days: CalendarDay[];
     }> = [];
+    
+    // Ensure people array exists
+    if (!people || people.length === 0) {
+      console.warn('YearlyView: people array is empty or undefined');
+      return months;
+    }
     
     const kids = people.filter((p: PersonConfig) => p.isChild === true);
     const adults = people.filter((p: PersonConfig) => p.isChild !== true);
@@ -67,8 +74,9 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
       }
     }
     
-    // Generate data for each month
+    // Generate data for each month - ensure we generate all 12 months
     for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      try {
       const lastDayOfMonth = new Date(currentYear, monthIndex + 1, 0);
       const days: CalendarDay[] = [];
       
@@ -119,51 +127,95 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
         days.push({ date, dayData: finalDayData, rating });
       }
       
-      months.push({
-        monthIndex,
-        monthName: monthNames[monthIndex],
-        days
-      });
+        months.push({
+          monthIndex,
+          monthName: monthNames[monthIndex],
+          days
+        });
+      } catch (error) {
+        console.error(`Error generating data for month ${monthIndex} (${monthNames[monthIndex]}):`, error);
+        // Still add the month even if there's an error, with empty days
+        months.push({
+          monthIndex,
+          monthName: monthNames[monthIndex],
+          days: Array.from({ length: 31 }, (_, i) => ({ 
+            date: new Date(currentYear, monthIndex, i + 1) 
+          }))
+        });
+      }
+    }
+    
+    // Ensure we have exactly 12 months
+    if (months.length !== 12) {
+      console.error(`YearlyView: Expected 12 months but generated ${months.length}. Missing months:`, 
+        Array.from({ length: 12 }, (_, i) => i).filter(idx => !months.find(m => m.monthIndex === idx))
+      );
     }
     
     return months;
   }, [dayDataMap, currentYear, people]);
 
+  // Debug: Log to verify all months are generated
+  if (process.env.NODE_ENV === 'development') {
+    console.log('YearlyView: Generated months:', yearlyCalendarData.length, yearlyCalendarData.map(m => m.monthName));
+    if (yearlyCalendarData.length !== 12) {
+      console.error(`❌ Expected 12 months but got ${yearlyCalendarData.length}`);
+      console.error('Missing months:', Array.from({ length: 12 }, (_, i) => monthNames[i])
+        .filter(name => !yearlyCalendarData.find(m => m.monthName === name)));
+    }
+    yearlyCalendarData.forEach((month, idx) => {
+      if (month.days.length !== 31) {
+        console.warn(`Month ${month.monthName} (index ${idx}) has ${month.days.length} days instead of 31`);
+      }
+    });
+  }
+
   return (
     <div className={styles.yearlyCalendar}>
-      <div className={styles.yearlyHeader}>
-        <div className={styles.monthLabelColumn}></div>
-        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-          <div key={day} className={styles.dayHeader}>
-            {day}
-          </div>
-        ))}
-      </div>
-      {yearlyCalendarData.map((month) => (
-        <div key={month.monthIndex} className={styles.yearlyMonthRow}>
-          <div className={styles.monthLabel}>
-            {month.monthName}
-          </div>
-          <div className={styles.yearlyDaysGrid}>
-            {month.days.map((calendarDay, dayIndex) => {
-              const isValidDay = calendarDay.dayData !== undefined || calendarDay.rating !== undefined;
-              return (
-                <div key={`${month.monthIndex}-${dayIndex}`} className={styles.yearlyDayCell}>
-                  <DayCell
-                    calendarDay={calendarDay}
-                    people={people}
-                    isCurrentMonth={true}
-                    isValidDay={isValidDay}
-                    onClick={() => onDayClick(calendarDay.date)}
-                    className={styles.yearlyDayCellContent}
-                    compact={true}
-                  />
-                </div>
-              );
-            })}
-          </div>
+      <div className={styles.yearlyCalendarWrapper}>
+        <div className={styles.monthNamesColumn}>
+          <div className={styles.monthNamesHeader}></div>
+          {yearlyCalendarData.map((month) => (
+            <div key={month.monthIndex} className={styles.monthNameItem}>
+              {month.monthName}
+            </div>
+          ))}
         </div>
-      ))}
+        <div className={styles.daysContainer}>
+          <div className={styles.yearlyHeader}>
+            {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+              <div key={day} className={styles.dayHeader}>
+                {day}
+              </div>
+            ))}
+          </div>
+          {yearlyCalendarData.map((month) => {
+            const lastDayOfMonth = new Date(currentYear, month.monthIndex + 1, 0);
+            const maxDays = lastDayOfMonth.getDate();
+            return (
+              <div key={month.monthIndex} className={styles.yearlyMonthRow}>
+                {month.days.map((calendarDay, dayIndex) => {
+                  const dayNumber = dayIndex + 1;
+                  const isValidDay = dayNumber <= maxDays;
+                  return (
+                    <div key={`${month.monthIndex}-${dayIndex}`} className={styles.yearlyDayCell}>
+                      <DayCell
+                        calendarDay={calendarDay}
+                        people={people}
+                        isCurrentMonth={true}
+                        isValidDay={isValidDay}
+                        onClick={() => onDayClick(calendarDay.date)}
+                        className={styles.yearlyDayCellContent}
+                        compact={true}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

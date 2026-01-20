@@ -83,8 +83,12 @@
 /* Mobile-specific improvements */
 @media (max-width: 767px) {
   .wrapper {
-    padding-left: var(--space-sm);
-    padding-right: var(--space-sm);
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .container {
+    max-width: 100%;
   }
 
   .header {
@@ -122,8 +126,13 @@
   }
 
   .footer {
-    padding: var(--space-lg) var(--space-md);
+    padding: var(--space-md) var(--space-sm);
     margin-top: auto;
+  }
+
+  .container :global(main) {
+    padding: 5px;
+    margin: 0;
   }
 
   .footer_wrapper {
