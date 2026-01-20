@@ -5,9 +5,11 @@
  * * INPUTS:
  * - isPublicHoliday: If true, the day is "free" (no PTO cost).
  * - schoolStatus: 'open' | 'closed' | 'half-day'.
- * - wfhAbility: Parent's ability to work from home (0 = None, 1 = Full).
  * - isBridgeDay: If the day sits between a holiday and a weekend.
- * - spouseAvailable: If the other parent is already covering childcare.
+ * - kidsCanStayHome: Information about which kids can stay home (no school, no activity)
+ * - adultsCanWfh: Information about which adults can work from home
+ * - mandatoryDaysCount: Number of mandatory days in the current period
+ * - maxMandatoryDaysForWfhSuggestion: Threshold for suggesting WFH
  */
 
 type SchoolStatus = 'open' | 'closed' | 'half-day';
@@ -16,21 +18,28 @@ export interface DayContext {
   date: Date;
   isPublicHoliday: boolean;
   schoolStatus: SchoolStatus;
-  wfhAbility: number; // 0.0 to 1.0 (0% to 100% productivity)
   isBridgeDay: boolean;
-  spouseAvailable: boolean;
+  // Fields for WFH suggestions
+  kidsCanStayHome?: Record<string, boolean>; // Map of kid ID to whether they can stay home
+  adultsCanWfh?: Record<string, boolean>; // Map of adult ID to whether they can work from home
+  mandatoryDaysCount?: number; // Number of mandatory days in the current period
+  maxMandatoryDaysForWfhSuggestion?: number; // Threshold for suggesting WFH
 }
 
 interface DayRating {
   score: number;         // 0 to 10
   recommendation: string;
   tag: 'MANDATORY' | 'HIGH_VALUE' | 'WFH_CANDIDATE' | 'SKIP' | 'WORK';
+  wfhSuggestion?: {
+    reason: string; // Explanation for the suggestion
+  };
 }
 
 export const calculateDayRating = (ctx: DayContext): DayRating => {
   let score = 0;
   let recommendation = "";
   let tag: DayRating['tag'] = 'SKIP';
+  let wfhSuggestion: DayRating['wfhSuggestion'] = undefined;
 
   // 1. FREE DAYS: If it's a public holiday, no PTO needed.
   if (ctx.isPublicHoliday) {
@@ -41,11 +50,33 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
   const isSchoolHoliday = (ctx.schoolStatus === 'closed' || ctx.schoolStatus === 'half-day');
   
   if (isSchoolHoliday) {
-    // School holidays are always mandatory, regardless of spouse/wfh status
+    // School holidays are mandatory, but check if WFH is a good option
     score = 10;
     recommendation = "School is closed.";
-    tag = 'MANDATORY';
-    return { score, recommendation, tag };
+    tag = 'MANDATORY'; // Default to mandatory
+    
+    // Check if we should suggest WFH and change tag to WFH_CANDIDATE
+    // Logic: If all kids (who are not busy with an activity but have no school) can stay home
+    // AND the number of mandatory days are less than threshold, suggest WFH
+    if (ctx.kidsCanStayHome && ctx.adultsCanWfh && ctx.mandatoryDaysCount !== undefined && ctx.maxMandatoryDaysForWfhSuggestion !== undefined) {
+      const allKidsCanStayHome = Object.values(ctx.kidsCanStayHome).every(canStay => canStay);
+      const hasKids = Object.keys(ctx.kidsCanStayHome).length > 0;
+      
+      if (allKidsCanStayHome && hasKids && ctx.mandatoryDaysCount < ctx.maxMandatoryDaysForWfhSuggestion) {
+        // Check if any adult can WFH
+        const canAnyAdultWfh = Object.values(ctx.adultsCanWfh).some(canWfh => canWfh === true);
+        
+        if (canAnyAdultWfh) {
+          // Change tag to WFH_CANDIDATE when WFH is a good option
+          tag = 'WFH_CANDIDATE';
+          wfhSuggestion = {
+            reason: `Consider WFH`
+          };
+        }
+      }
+    }
+    
+    return { score, recommendation, tag, wfhSuggestion };
   }
 
   // 3. EFFICIENCY (The "Long Weekend" Factor)
@@ -64,5 +95,5 @@ export const calculateDayRating = (ctx: DayContext): DayRating => {
     tag = 'WORK';
   }
 
-  return { score, recommendation, tag };
+  return { score, recommendation, tag, wfhSuggestion };
 }

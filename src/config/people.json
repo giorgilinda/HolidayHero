@@ -3,12 +3,16 @@
     {
       "id": "mom",
       "name": "Linda",
-      "isChild": false
+      "isChild": false,
+      "availability": true,
+      "wfhAbility": true
     },
     {
       "id": "dad",
       "name": "Marco",
-      "isChild": false
+      "isChild": false,
+      "availability": true,
+      "wfhAbility": true
     },
     {
       "id": "leon",
@@ -20,6 +24,9 @@
       "name": "Lena",
       "isChild": true
     }
-  ]
+  ],
+  "preferences": {
+    "maxMandatoryDaysForWfhSuggestion": 2
+  }
 }
 

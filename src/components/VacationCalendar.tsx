@@ -23,8 +23,6 @@ interface DayData {
   isPublicHoliday: boolean;
   isBridgeDay: boolean;
   schoolStatus: 'open' | 'closed' | 'half-day';
-  spouseAvailable: boolean;
-  wfhAbility: number;
   manualOverride?: ManualOverride;
 }
 
@@ -52,6 +50,31 @@ export const VacationCalendar = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [people] = useState<Person[]>(peopleConfig.people as PersonConfig[]);
+  
+  // Track dates that have been explicitly deleted to prevent auto-regeneration
+  const [deletedDates, setDeletedDates] = useState<Set<string>>(new Set());
+  
+  // Load deleted dates from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('holidayHero_deletedDates');
+      if (saved) {
+        const dates = JSON.parse(saved) as string[];
+        setDeletedDates(new Set(dates));
+      }
+    } catch (error) {
+      console.error('Failed to load deleted dates:', error);
+    }
+  }, []);
+  
+  // Save deleted dates to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('holidayHero_deletedDates', JSON.stringify(Array.from(deletedDates)));
+    } catch (error) {
+      console.error('Failed to save deleted dates:', error);
+    }
+  }, [deletedDates]);
 
   // Load manual overrides from API on mount
   useEffect(() => {
@@ -117,6 +140,11 @@ export const VacationCalendar = () => {
             continue;
           }
 
+          // Skip if this date was explicitly deleted by the user
+          if (deletedDates.has(dateStr)) {
+            continue;
+          }
+
           const existing = newOverrides.get(dateStr);
           const newOverride: ManualOverride = existing || {
             date: dateStr,
@@ -141,7 +169,7 @@ export const VacationCalendar = () => {
 
       return hasChanges ? newOverrides : prev;
     });
-  }, [holidaysData, isOverridesLoaded, people]);
+  }, [holidaysData, isOverridesLoaded, people, deletedDates]);
 
   // Save manual overrides to API whenever they change (but not on initial load)
   useEffect(() => {
@@ -228,8 +256,6 @@ export const VacationCalendar = () => {
             isPublicHoliday: false,
             isBridgeDay: false,
             schoolStatus: 'open',
-            spouseAvailable: userPreferences.spouseAvailable,
-            wfhAbility: userPreferences.wfhAbility,
           });
         }
       }
@@ -256,8 +282,6 @@ export const VacationCalendar = () => {
             isPublicHoliday: true,
             isBridgeDay: existing?.isBridgeDay || false,
             schoolStatus: existing?.schoolStatus || 'open',
-            spouseAvailable: userPreferences.spouseAvailable,
-            wfhAbility: userPreferences.wfhAbility,
           });
         }
       });
@@ -282,8 +306,6 @@ export const VacationCalendar = () => {
             isPublicHoliday: existing?.isPublicHoliday || false,
             isBridgeDay: existing?.isBridgeDay || false,
             schoolStatus: 'closed',
-            spouseAvailable: userPreferences.spouseAvailable,
-            wfhAbility: userPreferences.wfhAbility,
           });
         }
       });
@@ -362,8 +384,6 @@ export const VacationCalendar = () => {
             isPublicHoliday: false,
             isBridgeDay: true,
             schoolStatus: 'open',
-            spouseAvailable: userPreferences.spouseAvailable,
-            wfhAbility: userPreferences.wfhAbility,
           };
           
           map.set(dateStr, {
@@ -390,8 +410,6 @@ export const VacationCalendar = () => {
           isPublicHoliday: false,
           isBridgeDay: false,
           schoolStatus: 'open',
-          spouseAvailable: userPreferences.spouseAvailable,
-          wfhAbility: userPreferences.wfhAbility,
           manualOverride: override,
         });
       }
@@ -443,6 +461,14 @@ export const VacationCalendar = () => {
       newMap.set(override.date, override);
       return newMap;
     });
+    
+    // If user manually adds an override back, remove it from deleted dates
+    // so it can be auto-generated again in the future if needed
+    setDeletedDates(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(override.date);
+      return newSet;
+    });
   };
 
   const handleDeleteOverride = () => {
@@ -452,10 +478,19 @@ export const VacationCalendar = () => {
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
       const day = String(selectedDate.getDate()).padStart(2, '0');
       const dateStr = `${year}-${month}-${day}`;
+      
+      // Remove from overrides
       setManualOverrides(prev => {
         const newMap = new Map(prev);
         newMap.delete(dateStr);
         return newMap;
+      });
+      
+      // Mark as deleted to prevent auto-regeneration
+      setDeletedDates(prev => {
+        const newSet = new Set(prev);
+        newSet.add(dateStr);
+        return newSet;
       });
     }
   };
@@ -486,6 +521,53 @@ export const VacationCalendar = () => {
     let firstDayOfWeek = firstDay.getDay();
     firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Monday = 0
     
+    // Separate kids and adults
+    const kids = people.filter((p: PersonConfig) => p.isChild === true);
+    const adults = people.filter((p: PersonConfig) => p.isChild !== true);
+    
+    // Build adults WFH abilities map
+    const adultsCanWfh: Record<string, boolean> = {};
+    adults.forEach((adult: PersonConfig) => {
+      adultsCanWfh[adult.id] = userPreferences.adultWfhAbilities[adult.id] ?? false;
+    });
+    
+    // First pass: collect all days in the month to calculate mandatory days count
+    const allDaysInMonth: Array<{ dateString: string; isMandatory: boolean }> = [];
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const date = new Date(yearNum, monthIndex, day);
+      const dateString = `${yearNum}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const dayData = dayDataMap.get(dateString);
+      const isSchoolHoliday = dayData ? (dayData.schoolStatus === 'closed' || dayData.schoolStatus === 'half-day') : false;
+      const isPublicHoliday = dayData?.isPublicHoliday || false;
+      allDaysInMonth.push({
+        dateString,
+        isMandatory: isSchoolHoliday && !isPublicHoliday
+      });
+    }
+    
+    // Calculate mandatory days count for each day (count consecutive mandatory days including current day)
+    const mandatoryDaysCountMap = new Map<string, number>();
+    for (let i = 0; i < allDaysInMonth.length; i++) {
+      if (allDaysInMonth[i].isMandatory) {
+        // Find the start of the consecutive mandatory period
+        let start = i;
+        while (start > 0 && allDaysInMonth[start - 1].isMandatory) {
+          start--;
+        }
+        // Find the end of the consecutive mandatory period
+        let end = i;
+        while (end < allDaysInMonth.length - 1 && allDaysInMonth[end + 1].isMandatory) {
+          end++;
+        }
+        // Count total consecutive mandatory days in this period
+        const count = end - start + 1;
+        // Set the same count for all days in this period
+        for (let j = start; j <= end; j++) {
+          mandatoryDaysCountMap.set(allDaysInMonth[j].dateString, count);
+        }
+      }
+    }
+    
     // Add empty cells for days before the first day of the month
     // JavaScript Date: day 0 = last day of previous month, day -1 = second to last, etc.
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -507,18 +589,34 @@ export const VacationCalendar = () => {
         isPublicHoliday: false,
         isBridgeDay: false,
         schoolStatus: 'open',
-        spouseAvailable: userPreferences.spouseAvailable,
-        wfhAbility: userPreferences.wfhAbility,
       };
+      
+      // Calculate which kids can stay home (no school, no activity)
+      const kidsCanStayHome: Record<string, boolean> = {};
+      const isSchoolClosed = finalDayData.schoolStatus === 'closed' || finalDayData.schoolStatus === 'half-day';
+      const override = finalDayData.manualOverride;
+      
+      kids.forEach((kid: PersonConfig) => {
+        // Kid can stay home if:
+        // 1. School is closed (no school)
+        // 2. Kid doesn't have an activity (not in override or override type is not 'activity')
+        const hasActivity = override?.people[kid.id] === 'activity';
+        kidsCanStayHome[kid.id] = isSchoolClosed && !hasActivity;
+      });
+      
+      // Get mandatory days count for this day
+      const mandatoryDaysCount = mandatoryDaysCountMap.get(dateString) ?? 0;
       
       let rating;
       const currentDay: DayContext = {
         date: date,
         isPublicHoliday: finalDayData.isPublicHoliday,
         schoolStatus: finalDayData.schoolStatus,
-        wfhAbility: finalDayData.wfhAbility,
         isBridgeDay: finalDayData.isBridgeDay,
-        spouseAvailable: finalDayData.spouseAvailable
+        kidsCanStayHome,
+        adultsCanWfh,
+        mandatoryDaysCount,
+        maxMandatoryDaysForWfhSuggestion: userPreferences.maxMandatoryDaysForWfhSuggestion
       };
       rating = calculateDayRating(currentDay);
       
@@ -532,7 +630,7 @@ export const VacationCalendar = () => {
     }
     
     return days;
-  }, [yearNum, monthIndex, dayDataMap]);
+  }, [yearNum, monthIndex, dayDataMap, people]);
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -638,6 +736,14 @@ export const VacationCalendar = () => {
                     <div className={styles.recommendation}>
                       {calendarDay.rating.recommendation}
                     </div>
+                    {calendarDay.rating.wfhSuggestion && (
+                      <div className={styles.wfhSuggestion}>
+                        <span className={styles.wfhSuggestionIcon}>💡</span>
+                        <span className={styles.wfhSuggestionText}>
+                          {calendarDay.rating.wfhSuggestion.reason}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
