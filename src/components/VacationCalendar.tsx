@@ -8,6 +8,7 @@ import { YearlyView } from './YearlyView';
 import { DayEditDialog, type ManualOverride } from './DayEditDialog';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useManualOverrides } from '@/hooks/useManualOverrides';
+import { THEME_COLORS, THEME_SPACING } from '@/utils/themeConstants';
 
 export const VacationCalendar = () => {
   const now = new Date();
@@ -180,7 +181,13 @@ export const VacationCalendar = () => {
         </button>
       </div>
       {holidaysError && (
-        <div style={{ padding: '8px', margin: '8px', backgroundColor: '#fee', color: '#c00', borderRadius: '4px' }}>
+        <div style={{ 
+          padding: THEME_SPACING.sm, 
+          margin: THEME_SPACING.sm, 
+          backgroundColor: THEME_COLORS.errorBackground, 
+          color: THEME_COLORS.errorText, 
+          borderRadius: '4px' 
+        }}>
           Error loading holidays: {holidaysError}
         </div>
       )}

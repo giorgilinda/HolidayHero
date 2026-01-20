@@ -1,11 +1,11 @@
 .yearlyCalendar {
-    --header-height: 40px;
-    --row-height: 30px;
+    --header-height: var(--yearly-header-height-desktop);
+    --row-height: var(--yearly-row-height-desktop);
     
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    background: white;
+    background: var(--color-background);
     display: flex;
     width: 100%;
     position: relative;
@@ -24,38 +24,38 @@
 }
 
 .yearlyCalendarWrapper::-webkit-scrollbar {
-    height: 8px;
+    height: var(--yearly-scrollbar-height);
 }
 
 .yearlyCalendarWrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--scrollbar-track);
 }
 
 .yearlyCalendarWrapper::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: var(--scrollbar-thumb);
+    border-radius: var(--radius-sm);
 }
 
 .yearlyCalendarWrapper::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--scrollbar-thumb-hover);
 }
 
 .monthNamesColumn {
     position: sticky;
     left: 0;
     z-index: 20;
-    background: white;
-    border-right: 2px solid var(--border-color);
+    background: var(--color-background);
+    border-right: 2px solid var(--ui-border-default);
     flex-shrink: 0;
-    width: 120px;
+    width: var(--yearly-month-column-width-desktop);
 }
 
 .monthNamesHeader {
-    padding: 12px 8px;
+    padding: var(--space-sm) var(--space-sm);
     font-weight: 500;
-    color: var(--text-secondary);
-    background-color: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
+    color: var(--ui-text-secondary);
+    background-color: var(--ui-background-light);
+    border-bottom: 1px solid var(--ui-border-default);
     height: var(--header-height);
     min-height: var(--header-height);
     display: flex;
@@ -63,11 +63,11 @@
 }
 
 .monthNameItem {
-    padding: 12px 8px;
+    padding: var(--space-sm) var(--space-sm);
     font-weight: 500;
-    color: var(--text-primary);
-    background-color: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
+    color: var(--ui-text-default);
+    background-color: var(--ui-background-light);
+    border-bottom: 1px solid var(--ui-border-default);
     display: flex;
     align-items: center;
     height: var(--row-height);
@@ -87,27 +87,27 @@
 
 .yearlyHeader {
     display: grid;
-    grid-template-columns: repeat(31, 40px);
-    background-color: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
+    grid-template-columns: repeat(31, var(--yearly-day-width-desktop));
+    background-color: var(--ui-background-light);
+    border-bottom: 1px solid var(--ui-border-default);
     position: sticky;
     top: 0;
     z-index: 10;
     width: max-content;
-    min-width: calc(31 * 40px);
+    min-width: calc(31 * var(--yearly-day-width-desktop));
     height: var(--header-height);
     min-height: var(--header-height);
 }
 
 .dayHeader {
-    padding: 8px 4px;
+    padding: var(--space-sm) var(--space-xs);
     text-align: center;
-    font-size: 10px;
+    font-size: var(--font-size-xxs);
     font-weight: 500;
-    color: var(--text-secondary);
-    border-right: 1px solid var(--border-color);
-    min-width: 40px;
-    width: 40px;
+    color: var(--ui-text-secondary);
+    border-right: 1px solid var(--ui-border-default);
+    min-width: var(--yearly-day-width-desktop);
+    width: var(--yearly-day-width-desktop);
     box-sizing: border-box;
 }
 
@@ -117,10 +117,10 @@
 
 .yearlyMonthRow {
     display: grid;
-    grid-template-columns: repeat(31, 40px);
-    border-bottom: 1px solid var(--border-color);
+    grid-template-columns: repeat(31, var(--yearly-day-width-desktop));
+    border-bottom: 1px solid var(--ui-border-default);
     width: max-content;
-    min-width: calc(31 * 40px);
+    min-width: calc(31 * var(--yearly-day-width-desktop));
     height: var(--row-height);
     min-height: var(--row-height);
 }
@@ -136,9 +136,9 @@
 .yearlyDayCell {
     height: var(--row-height);
     min-height: var(--row-height);
-    min-width: 40px;
-    width: 40px;
-    border-right: 1px solid var(--border-color);
+    min-width: var(--yearly-day-width-desktop);
+    width: var(--yearly-day-width-desktop);
+    border-right: 1px solid var(--ui-border-default);
     padding: 0;
     box-sizing: border-box;
 }
@@ -150,115 +150,114 @@
 .yearlyDayCellContent {
     height: var(--row-height);
     min-height: var(--row-height);
-    min-width: 40px;
-    padding: 2px;
+    min-width: var(--yearly-day-width-desktop);
+    padding: var(--calendar-day-cell-compact-padding);
     border: none;
 }
 
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     .yearlyCalendar {
-        --header-height: 30px;
-        --row-height: 18px;
+        --header-height: var(--yearly-header-height-tablet);
+        --row-height: var(--yearly-row-height-tablet);
         
-        border-radius: 4px;
+        border-radius: var(--radius-sm);
     }
 
     .daysContainer {
-        max-width: calc(100vw - 60px);
+        max-width: calc(100vw - var(--yearly-month-column-width-tablet));
     }
 
     .monthNamesColumn {
-        width: 60px;
+        width: var(--yearly-month-column-width-tablet);
     }
 
     .monthNamesHeader {
-        padding: 6px 3px;
-        font-size: 8px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-md);
     }
 
     .monthNameItem {
-        padding: 6px 3px;
-        font-size: 8px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-md);
     }
 
     .yearlyHeader {
-        grid-template-columns: repeat(31, 18px);
-        min-width: calc(31 * 18px);
+        grid-template-columns: repeat(31, var(--yearly-day-width-tablet));
+        min-width: calc(31 * var(--yearly-day-width-tablet));
     }
 
     .dayHeader {
-        padding: 3px 1px;
-        font-size: 7px;
-        min-width: 18px;
-        width: 18px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-sm);
+        min-width: var(--yearly-day-width-tablet);
+        width: var(--yearly-day-width-tablet);
     }
 
     .yearlyMonthRow {
-        grid-template-columns: repeat(31, 18px);
-        min-width: calc(31 * 18px);
+        grid-template-columns: repeat(31, var(--yearly-day-width-tablet));
+        min-width: calc(31 * var(--yearly-day-width-tablet));
     }
 
     .yearlyDayCell {
-        min-width: 18px;
-        width: 18px;
+        min-width: var(--yearly-day-width-tablet);
+        width: var(--yearly-day-width-tablet);
     }
 
     .yearlyDayCellContent {
-        min-width: 18px;
-        padding: 1px;
+        min-width: var(--yearly-day-width-tablet);
+        padding: var(--space-xs);
     }
 }
 
 @media (max-width: 480px) {
     .yearlyCalendar {
-        --header-height: 25px;
-        --row-height: 25px;
+        --header-height: var(--yearly-header-height-mobile);
+        --row-height: var(--yearly-row-height-mobile);
     }
 
     .daysContainer {
-        max-width: calc(100vw - 50px);
+        max-width: calc(100vw - var(--yearly-month-column-width-mobile));
     }
 
     .monthNamesColumn {
-        width: 50px;
+        width: var(--yearly-month-column-width-mobile);
     }
 
     .monthNamesHeader {
-        padding: 4px 2px;
-        font-size: 7px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-sm);
     }
 
     .monthNameItem {
-        padding: 4px 2px;
-        font-size: 7px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-sm);
     }
 
     .yearlyHeader {
-        grid-template-columns: repeat(31, 15px);
-        min-width: calc(31 * 15px);
+        grid-template-columns: repeat(31, var(--yearly-day-width-mobile));
+        min-width: calc(31 * var(--yearly-day-width-mobile));
     }
 
     .dayHeader {
-        padding: 2px 1px;
-        font-size: 6px;
-        min-width: 15px;
-        width: 15px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-mobile-xs);
+        min-width: var(--yearly-day-width-mobile);
+        width: var(--yearly-day-width-mobile);
     }
 
-
     .yearlyMonthRow {
-        grid-template-columns: repeat(31, 15px);
-        min-width: calc(31 * 15px);
+        grid-template-columns: repeat(31, var(--yearly-day-width-mobile));
+        min-width: calc(31 * var(--yearly-day-width-mobile));
     }
 
     .yearlyDayCell {
-        min-width: 15px;
-        width: 15px;
+        min-width: var(--yearly-day-width-mobile);
+        width: var(--yearly-day-width-mobile);
     }
 
     .yearlyDayCellContent {
-        min-width: 15px;
+        min-width: var(--yearly-day-width-mobile);
         padding: 0;
     }
 }

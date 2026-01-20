@@ -23,7 +23,7 @@ const BaseTemplate = (props: { children: React.ReactNode }) => {
           </ul>
         </header>
 
-        <main>{props.children}</main>
+        <main className={styles.main}>{props.children}</main>
 
         <footer className={styles.footer}>
           <div className={styles.footer_wrapper}>

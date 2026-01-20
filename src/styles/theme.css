@@ -75,6 +75,7 @@
   --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
+  --font-size-xxs: 10px;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
@@ -83,6 +84,13 @@
   --font-size-2xl: 24px;
   --font-size-3xl: 30px;
   --font-size-4xl: 36px;
+  
+  /* Mobile-specific font sizes */
+  --font-size-mobile-xs: 6px;
+  --font-size-mobile-sm: 7px;
+  --font-size-mobile-md: 8px;
+  --font-size-mobile-lg: 9px;
+  --font-size-mobile-xl: 10px;
 
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
@@ -104,6 +112,99 @@
   --mobile-safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --mobile-safe-area-left: env(safe-area-inset-left, 0px);
   --mobile-safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Media Query Breakpoints */
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1200px;
+
+  /* Calendar-specific Colors */
+  --calendar-holiday: #e2e8f0;
+  --calendar-mandatory: #feb2b2;
+  --calendar-high-value: #fefcbf;
+  --calendar-work-from-home: #FFC067;
+  --calendar-work-day: #ffffff;
+  --calendar-other-month: #f5f5f5;
+  --calendar-today-border: #1a73e8;
+  --calendar-manual-override: #d4edda;
+  --calendar-manual-override-border: #28a745;
+  --calendar-manual-override-activity: #fff3cd;
+  --calendar-manual-override-activity-border: #ffc107;
+  --calendar-manual-override-activity-text: #856404;
+
+  /* UI Component Colors */
+  --ui-background-light: #f8f9fa;
+  --ui-background-hover: #f8f9fa;
+  --ui-background-active: #e8eaed;
+  --ui-background-selected: #e8f0fe;
+  --ui-background-input: #f1f3f4;
+  --ui-border-default: #dadce0;
+  --ui-border-light: #e0e0e0;
+  --ui-text-default: #3c4043;
+  --ui-text-secondary: #70757a;
+
+  /* Scrollbar Colors */
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #888;
+  --scrollbar-thumb-hover: #555;
+
+  /* Overlay/Dialog Colors */
+  --overlay-background: rgba(0, 0, 0, 0.5);
+  --dialog-background: #ffffff;
+  --dialog-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Error Colors */
+  --error-background: #fee;
+  --error-text: #c00;
+  --error-border: #ea4335;
+  --error-border-dark: #c5221f;
+  --error-background-light: #fce8e6;
+  --error-primary: #ea4335;
+  --error-primary-dark: #c5221f;
+
+  /* Button Colors */
+  --button-primary: #1a73e8;
+  --button-primary-hover: #1557b0;
+
+  /* Calendar Day Cell Sizes */
+  --calendar-day-cell-size: 120px;
+  --calendar-day-cell-compact-size: 30px;
+  --calendar-day-cell-padding: 8px;
+  --calendar-day-cell-compact-padding: 2px;
+
+  /* Calendar Tag Hover Colors */
+  --calendar-skip-hover: #d1d5db;
+  --calendar-mandatory-hover: #fc8181;
+  --calendar-high-value-hover: #fef08a;
+  --calendar-wfh-hover: #fbbf24;
+
+  /* WFH Suggestion Colors */
+  --calendar-wfh-suggestion-bg: #e0f2fe;
+  --calendar-wfh-suggestion-border: #0ea5e9;
+  --calendar-wfh-suggestion-text: #0c4a6e;
+
+  /* Yearly View Sizes */
+  --yearly-header-height-desktop: 40px;
+  --yearly-row-height-desktop: 30px;
+  --yearly-header-height-tablet: 30px;
+  --yearly-row-height-tablet: 18px;
+  --yearly-header-height-mobile: 25px;
+  --yearly-row-height-mobile: 25px;
+  --yearly-day-width-desktop: 40px;
+  --yearly-day-width-tablet: 18px;
+  --yearly-day-width-mobile: 15px;
+  --yearly-month-column-width-desktop: 120px;
+  --yearly-month-column-width-tablet: 60px;
+  --yearly-month-column-width-mobile: 50px;
+  --yearly-scrollbar-height: 8px;
+
+  /* Button Sizes */
+  --button-size-default: 40px;
+  --button-size-tablet: 36px;
+  --button-size-mobile: 32px;
+  --button-arrow-font-size-desktop: 24px;
+  --button-arrow-font-size-tablet: 18px;
+  --button-arrow-font-size-mobile: 16px;
 }
 
 /* Dark mode support */

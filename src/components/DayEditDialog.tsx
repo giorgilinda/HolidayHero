@@ -121,8 +121,11 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
                           currentType === 'vacation' && styles.typeButtonActive
                         )}
                         onClick={() => handlePersonToggle(person.id, 'vacation')}
+                        aria-label="Vacation"
+                        title="Vacation"
                       >
-                        🏖️ Vacation
+                        <span className={styles.typeButtonIcon}>🏖️</span>
+                        <span className={styles.typeButtonLabel}>Vacation</span>
                       </button>
                       <button
                         type="button"
@@ -131,8 +134,11 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
                           currentType === 'wfh' && styles.typeButtonActive
                         )}
                         onClick={() => handlePersonToggle(person.id, 'wfh')}
+                        aria-label="Work From Home"
+                        title="Work From Home"
                       >
-                        🏠 WFH
+                        <span className={styles.typeButtonIcon}>🏠</span>
+                        <span className={styles.typeButtonLabel}>WFH</span>
                       </button>
                       <button
                         type="button"
@@ -142,8 +148,11 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
                           currentType === 'activity' && styles.typeButtonActivityActive
                         )}
                         onClick={() => handlePersonToggle(person.id, 'activity')}
+                        aria-label="Activity"
+                        title="Activity"
                       >
-                        🎨 Activity
+                        <span className={styles.typeButtonIcon}>🎨</span>
+                        <span className={styles.typeButtonLabel}>Activity</span>
                       </button>
                       {currentType && (
                         <button
@@ -157,6 +166,7 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
                             });
                           }}
                           title="Remove person"
+                          aria-label="Remove person"
                         >
                           ✕
                         </button>

@@ -1,21 +1,21 @@
 .calendar {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    background: white;
+    background: var(--color-background);
 }
 
 .weekHeader {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background-color: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--ui-background-light);
+    border-bottom: 1px solid var(--ui-border-default);
 }
 
 .weekDayHeader {
-    padding: 12px 8px;
+    padding: var(--space-sm) var(--space-sm);
     text-align: center;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     font-weight: 500;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -30,17 +30,17 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     .calendar {
-        border-radius: 4px;
+        border-radius: var(--radius-sm);
         margin: 0;
     }
 
     .weekHeader {
-        font-size: 9px;
+        font-size: var(--font-size-xs);
     }
 
     .weekDayHeader {
-        padding: 6px 2px;
-        font-size: 8px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-xs);
         letter-spacing: 0;
     }
 
@@ -57,7 +57,7 @@
     }
 
     .weekDayHeader {
-        padding: 4px 1px;
-        font-size: 7px;
+        padding: var(--space-xs) var(--space-xs);
+        font-size: var(--font-size-xs);
     }
 }
