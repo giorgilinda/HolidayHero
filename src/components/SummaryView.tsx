@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import styles from './SummaryView.module.css';
 import { Person } from './DayEditDialog';
 import { DayData, ManualOverride, PersonConfig } from './calendarTypes';
@@ -21,11 +21,15 @@ interface SummaryViewProps {
   onNavigateToDay: (date: Date) => void;
 }
 
+type DayType = 'vacation' | 'wfh' | 'bridge' | 'mandatory' | 'activity' | 'with-issue';
+
 interface DaySummary {
   date: string;
   dateObj: Date;
   rating?: DayRating;
   dayData?: DayData;
+  type: DayType;
+  people: Array<{ id: string; name: string; type: 'vacation' | 'wfh' | 'activity' }>;
 }
 
 interface PersonStats {
@@ -35,6 +39,8 @@ interface PersonStats {
   wfhDays: number;
   activityDays: number;
 }
+
+type FilterType = 'all' | 'vacation' | 'wfh' | 'bridge' | 'mandatory' | 'activity' | 'need-attention';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({
   currentYear,
@@ -49,10 +55,9 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
   onBulkDelete,
   onNavigateToDay,
 }) => {
+  const [activeFilter, setActiveFilter] = useState<FilterType>('need-attention');
   const summaryData = useMemo(() => {
-    const mandatoryDays: DaySummary[] = [];
-    const wfhDays: DaySummary[] = [];
-    const bridgeDays: DaySummary[] = [];
+    const allDays: DaySummary[] = [];
     const personStats: PersonStats[] = people.map(p => ({
       personId: p.id,
       personName: p.name,
@@ -128,14 +133,29 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
           console.log(`Found override for ${dateString}:`, override);
         }
 
-        // Count person stats from overrides
+        // Check if it's a weekend
+        const dayOfWeek = date.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
+
+        // Extract people involved on this day
+        const dayPeople: Array<{ id: string; name: string; type: 'vacation' | 'wfh' | 'activity' }> = [];
         if (override) {
           Object.entries(override.people).forEach(([personId, type]) => {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+              dayPeople.push({ id: personId, name: person.name, type });
+            }
+            // Count person stats from overrides
+            // Exclude weekends and public holidays from vacation and mandatory counts
             const stat = personStats.find(s => s.personId === personId);
             if (stat) {
-              if (type === 'vacation') stat.vacationDays++;
-              else if (type === 'wfh') stat.wfhDays++;
-              else if (type === 'activity') stat.activityDays++;
+              if (type === 'vacation' && !isPublicHoliday && !isWeekend) {
+                stat.vacationDays++;
+              } else if (type === 'wfh') {
+                stat.wfhDays++;
+              } else if (type === 'activity') {
+                stat.activityDays++;
+              }
             }
           });
         }
@@ -169,55 +189,127 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
           return override?.people[kid.id] === 'activity';
         });
 
-        // Track if day was added to any category
-        let dayAdded = false;
-
-        // Categorize days based on rating
+        // Determine day type and categorize
+        // Exclude public holidays and weekends from vacation and mandatory
         if (!isPublicHoliday) {
-          if (rating.tag === 'WFH_CANDIDATE' || (override && Object.values(override.people).includes('wfh'))) {
-            // WFH candidate or manual WFH override
-            if (!wfhDays.find(d => d.date === dateString)) {
-              wfhDays.push({ date: dateString, dateObj: date, dayData, rating });
-              dayAdded = true;
+          let dayType: DaySummary['type'] | null = null;
+          let isWithIssue = false;
+
+          // Check for manual overrides first
+          if (override) {
+            const overrideTypes = Object.values(override.people);
+            if (overrideTypes.includes('vacation') && !isWeekend) {
+              // Only count vacation if it's not a weekend
+              dayType = 'vacation';
+            } else if (overrideTypes.includes('wfh')) {
+              dayType = 'wfh';
+            } else if (overrideTypes.includes('activity')) {
+              dayType = 'activity';
             }
-          } else if (rating.tag === 'MANDATORY') {
-            // Mandatory days (school holidays that are not WFH candidates)
-            // Only show if we need to take care of the kids:
-            // 1. Not all kids have activities (at least one kid needs care)
-            // 2. No adults are on vacation (no adult available to help)
-            
-            // Check if all kids have activities
+          }
+
+          // If no override, check rating
+          if (!dayType) {
+            if (rating.tag === 'WFH_CANDIDATE') {
+              dayType = 'wfh';
+            } else if (rating.tag === 'MANDATORY' && !isWeekend) {
+              // Only count mandatory if it's not a weekend
+              dayType = 'mandatory';
+            } else if (rating.tag === 'HIGH_VALUE' || isBridgeDay) {
+              dayType = 'bridge';
+            }
+          }
+
+          // Check if mandatory day has issues (WFH suggestion or bridge day)
+          if (dayType === 'mandatory') {
+            const isWfhCandidate = rating.tag === 'WFH_CANDIDATE';
+            if (isWfhCandidate || isBridgeDay) {
+              isWithIssue = true;
+            }
+          }
+
+          // Check if we should show mandatory days (same logic as before)
+          if (dayType === 'mandatory') {
             const allKidsHaveActivity = kids.length > 0 && kids.every((kid: PersonConfig) => {
               return override?.people[kid.id] === 'activity';
             });
             
-            // Check if any adults are on vacation
             const hasAdultOnVacation = adults.some((adult: PersonConfig) => {
               return override?.people[adult.id] === 'vacation';
             });
             
             const shouldShowMandatory = !allKidsHaveActivity && !hasAdultOnVacation;
             
-            if (shouldShowMandatory && !wfhDays.find(d => d.date === dateString)) {
-              mandatoryDays.push({ date: dateString, dateObj: date, dayData, rating });
-              dayAdded = true;
+            if (!shouldShowMandatory) {
+              dayType = null; // Don't show this mandatory day
             }
-          } else if (rating.tag === 'HIGH_VALUE' || isBridgeDay) {
-            // Bridge days
-            bridgeDays.push({ date: dateString, dateObj: date, dayData, rating });
-            dayAdded = true;
+          }
+
+          if (dayType) {
+            // Add as the primary type
+            allDays.push({ 
+              date: dateString, 
+              dateObj: date, 
+              dayData, 
+              rating,
+              type: dayType,
+              people: dayPeople
+            });
+
+            // If it's a mandatory day with issues, also add as 'with-issue'
+            if (isWithIssue && dayType === 'mandatory') {
+              allDays.push({ 
+                date: dateString, 
+                dateObj: date, 
+                dayData, 
+                rating,
+                type: 'with-issue',
+                people: dayPeople
+              });
+            }
           }
         }
       }
     }
 
+    // Remove duplicates (same date can appear multiple times with different types)
+    const uniqueDays = new Map<string, DaySummary>();
+    allDays.forEach(day => {
+      const existing = uniqueDays.get(day.date);
+      if (!existing) {
+        uniqueDays.set(day.date, day);
+      } else {
+        const dayType: DayType = day.type;
+        const existingType: DayType = existing.type;
+        if (dayType === 'with-issue' && existingType !== 'with-issue') {
+          // Keep 'with-issue' entry if we have both
+          uniqueDays.set(day.date, day);
+        } else if (dayType !== 'with-issue' && existingType === 'with-issue') {
+          // Replace 'with-issue' with actual type if we have it
+          uniqueDays.set(day.date, day);
+        }
+      }
+    });
+
     return {
-      mandatoryDays: mandatoryDays.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime()),
-      wfhDays: wfhDays.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime()),
-      bridgeDays: bridgeDays.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime()),
+      allDays: Array.from(uniqueDays.values()).sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime()),
       personStats: personStats.filter(p => p.vacationDays > 0 || p.wfhDays > 0 || p.activityDays > 0),
     };
   }, [currentYear, dayDataMap, people, manualOverrides]);
+
+  // Filter days based on active filter
+  const filteredDays = useMemo(() => {
+    if (activeFilter === 'all') {
+      return summaryData.allDays;
+    }
+    if (activeFilter === 'need-attention') {
+      // Show mandatory, wfh, and bridge days
+      return summaryData.allDays.filter(day => 
+        day.type === 'mandatory' || day.type === 'wfh' || day.type === 'bridge'
+      );
+    }
+    return summaryData.allDays.filter(day => day.type === activeFilter);
+  }, [summaryData.allDays, activeFilter]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
@@ -225,6 +317,11 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
       month: 'short', 
       day: 'numeric' 
     });
+  };
+
+  const isWeekend = (date: Date) => {
+    const dayOfWeek = date.getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
   };
 
   const handleRowClick = (date: Date, dateString: string, e: React.MouseEvent) => {
@@ -289,6 +386,57 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
       <section className={styles.section}>
         <div className={styles.daysSummaryHeader}>
           <h3 className={styles.sectionTitle}>Days Summary</h3>
+          <div className={styles.filterButtons}>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'all' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('all')}
+              title="Show all days"
+            >
+              All
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'vacation' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('vacation')}
+              title="Show vacation days"
+            >
+              🏖️ Vacation
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'wfh' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('wfh')}
+              title="Show WFH days"
+            >
+              🏠 WFH
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'bridge' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('bridge')}
+              title="Show bridge days"
+            >
+              🌉 Bridge
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'mandatory' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('mandatory')}
+              title="Show mandatory days"
+            >
+              ⚠️ Mandatory
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'activity' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('activity')}
+              title="Show activity days"
+            >
+              🎨 Activity
+            </button>
+            <button
+              className={classNames(styles.filterButton, activeFilter === 'need-attention' && styles.filterButtonActive)}
+              onClick={() => setActiveFilter('need-attention')}
+              title="Show days that need attention (mandatory, WFH, bridge)"
+            >
+              ⚠️ Need Attention
+            </button>
+          </div>
           <div className={styles.summaryActions}>
             <button
               className={classNames(styles.selectButton, selectionMode && styles.selectButtonActive)}
@@ -329,17 +477,49 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
               {selectionMode && <th className={styles.checkboxHeader}></th>}
               <th>Date</th>
               <th>Type</th>
+              <th>People</th>
               <th>Holiday/Note</th>
             </tr>
           </thead>
           <tbody>
-            {/* Mandatory Days */}
-            {summaryData.mandatoryDays.map((day) => {
+            {filteredDays.map((day) => {
               const isSelected = isDateSelected(day.date);
+              const getTypeLabel = () => {
+                switch (day.type) {
+                  case 'vacation': return 'Vacation';
+                  case 'wfh': return 'WFH';
+                  case 'bridge': return 'Bridge';
+                  case 'mandatory': return 'Mandatory';
+                  case 'activity': return 'Activity';
+                  case 'with-issue': return 'With Issue';
+                  default: return day.type;
+                }
+              };
+              const getRowClass = () => {
+                switch (day.type) {
+                  case 'vacation': return styles.vacationRow;
+                  case 'wfh': return styles.wfhRow;
+                  case 'bridge': return styles.bridgeRow;
+                  case 'mandatory': return styles.mandatoryRow;
+                  case 'activity': return styles.activityRow;
+                  case 'with-issue': return styles.withIssueRow;
+                  default: return '';
+                }
+              };
+              const peopleList = day.people.length > 0 
+                ? day.people.map(p => `${p.name} (${p.type === 'vacation' ? '🏖️' : p.type === 'wfh' ? '🏠' : '🎨'})`).join(', ')
+                : '-';
+              
+              const isWeekendDay = isWeekend(day.dateObj);
+              
               return (
                 <tr 
-                  key={`mandatory-${day.date}`} 
-                  className={classNames(styles.mandatoryRow, isSelected && styles.selectedRow)}
+                  key={`${day.type}-${day.date}`} 
+                  className={classNames(
+                    getRowClass(), 
+                    isSelected && styles.selectedRow,
+                    isWeekendDay && styles.weekendRow
+                  )}
                   onClick={(e) => handleRowClick(day.dateObj, day.date, e)}
                 >
                   {selectionMode && (
@@ -351,71 +531,9 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
                   )}
                   <td className={styles.dateCell}>{formatDate(day.dateObj)}</td>
                   <td className={styles.typeCell}>
-                    <span className={styles.typeBadge}>Mandatory</span>
+                    <span className={styles.typeBadge}>{getTypeLabel()}</span>
                   </td>
-                  <td className={styles.noteCell}>{day.dayData?.holidayName || '-'}</td>
-                </tr>
-              );
-            })}
-            {/* WFH Days */}
-            {summaryData.wfhDays.map((day) => {
-              const isSelected = isDateSelected(day.date);
-              const wfhPeople = day.dayData?.manualOverride
-                ? Object.entries(day.dayData.manualOverride.people)
-                    .filter(([_, type]) => type === 'wfh')
-                    .map(([personId]) => {
-                      const person = people.find(p => p.id === personId);
-                      return person?.name;
-                    })
-                    .filter(Boolean)
-                    .join(', ')
-                : null;
-              return (
-                <tr 
-                  key={`wfh-${day.date}`} 
-                  className={classNames(styles.wfhRow, isSelected && styles.selectedRow)}
-                  onClick={(e) => handleRowClick(day.dateObj, day.date, e)}
-                >
-                  {selectionMode && (
-                    <td className={styles.checkboxCell} onClick={(e) => handleCheckboxClick(day.dateObj, e)}>
-                      <span className={classNames(styles.checkbox, isSelected && styles.checkboxChecked)}>
-                        {isSelected && '✓'}
-                      </span>
-                    </td>
-                  )}
-                  <td className={styles.dateCell}>{formatDate(day.dateObj)}</td>
-                  <td className={styles.typeCell}>
-                    <span className={styles.typeBadge}>WFH</span>
-                  </td>
-                  <td className={styles.noteCell}>
-                    {day.dayData?.holidayName || ''}
-                    {wfhPeople && (
-                      <span className={styles.wfhPeople}> ({wfhPeople})</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-            {/* Bridge Days */}
-            {summaryData.bridgeDays.map((day) => {
-              const isSelected = isDateSelected(day.date);
-              return (
-                <tr 
-                  key={`bridge-${day.date}`} 
-                  className={classNames(styles.bridgeRow, isSelected && styles.selectedRow)}
-                  onClick={(e) => handleRowClick(day.dateObj, day.date, e)}
-                >
-                  {selectionMode && (
-                    <td className={styles.checkboxCell} onClick={(e) => handleCheckboxClick(day.dateObj, e)}>
-                      <span className={classNames(styles.checkbox, isSelected && styles.checkboxChecked)}>
-                        {isSelected && '✓'}
-                      </span>
-                    </td>
-                  )}
-                  <td className={styles.dateCell}>{formatDate(day.dateObj)}</td>
-                  <td className={styles.typeCell}>
-                    <span className={styles.typeBadge}>Bridge</span>
-                  </td>
+                  <td className={styles.peopleCell}>{peopleList}</td>
                   <td className={styles.noteCell}>{day.dayData?.holidayName || '-'}</td>
                 </tr>
               );
@@ -424,12 +542,14 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
         </table>
       </section>
 
-      {summaryData.mandatoryDays.length === 0 && 
-       summaryData.wfhDays.length === 0 && 
-       summaryData.bridgeDays.length === 0 && 
-       summaryData.personStats.length === 0 && (
+      {filteredDays.length === 0 && summaryData.personStats.length === 0 && (
         <div className={styles.emptyState}>
           No vacation data available for {currentYear}
+        </div>
+      )}
+      {filteredDays.length === 0 && summaryData.personStats.length > 0 && (
+        <div className={styles.emptyState}>
+          No days match the selected filter
         </div>
       )}
     </div>

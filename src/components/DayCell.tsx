@@ -30,6 +30,8 @@ export const DayCell: React.FC<DayCellProps> = ({
   selectionMode = false,
 }) => {
   const isToday = isValidDay && calendarDay.date.toDateString() === new Date().toDateString();
+  const dayOfWeek = calendarDay.date.getDay();
+  const isWeekend = isValidDay && (dayOfWeek === 0 || dayOfWeek === 6); // Sunday = 0, Saturday = 6
   
   return (
     <div
@@ -37,6 +39,7 @@ export const DayCell: React.FC<DayCellProps> = ({
         dayCellStyles.dayCell,
         !isCurrentMonth && dayCellStyles.otherMonth,
         !isValidDay && dayCellStyles.invalidDay,
+        isWeekend && dayCellStyles.weekend,
         isToday && dayCellStyles.today,
         calendarDay.rating && dayCellStyles[calendarDay.rating.tag],
         calendarDay.dayData?.manualOverride && dayCellStyles.manualOverride,

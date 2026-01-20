@@ -131,6 +131,8 @@
   --calendar-manual-override-activity: #fff3cd;
   --calendar-manual-override-activity-border: #ffc107;
   --calendar-manual-override-activity-text: #856404;
+  --calendar-weekend: #f5f7fa;
+  --calendar-weekend-other-month: #f0f2f5;
 
   /* UI Component Colors */
   --ui-background-light: #f8f9fa;

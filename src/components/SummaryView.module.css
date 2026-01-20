@@ -3,6 +3,8 @@
     max-width: 1200px;
     margin: 0 auto;
     background-color: var(--color-background);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .title {
@@ -15,29 +17,61 @@
 
 .daysSummaryHeader {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--space-md);
+    margin-bottom: var(--space-md);
 }
 
-.summaryActions {
+.filterButtons {
     display: flex;
-    gap: var(--space-sm);
-    align-items: center;
+    gap: var(--space-xs);
     flex-wrap: wrap;
+    align-items: center;
 }
 
-.selectButton {
-    padding: var(--space-sm) var(--space-md);
+.filterButton {
+    padding: var(--space-xs) var(--space-sm);
     border: 1px solid var(--ui-border-default);
     border-radius: var(--radius-sm);
     background-color: var(--color-background);
     color: var(--ui-text-default);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     cursor: pointer;
     transition: all var(--transition-base);
+    white-space: nowrap;
+    min-height: var(--button-size-tablet);
+}
+
+.filterButton:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.filterButtonActive {
+    background-color: var(--button-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--button-primary);
+    font-weight: 500;
+}
+
+.summaryActions {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.selectButton {
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    color: var(--ui-text-default);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    min-height: var(--button-size-tablet);
 }
 
 .selectButton:hover {
@@ -51,14 +85,16 @@
 }
 
 .actionButton {
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
     border: 1px solid var(--ui-border-default);
     border-radius: var(--radius-sm);
     background-color: var(--color-background);
     color: var(--ui-text-default);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     cursor: pointer;
     transition: all var(--transition-base);
+    white-space: nowrap;
+    min-height: var(--button-size-tablet);
 }
 
 .actionButton:hover {
@@ -69,6 +105,13 @@
     background-color: var(--error-primary);
     color: var(--color-text-inverse);
     border-color: var(--error-primary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    min-height: var(--button-size-tablet);
 }
 
 .deleteButton:hover {
@@ -76,9 +119,10 @@
 }
 
 .selectedCount {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--ui-text-secondary);
     padding: 0 var(--space-xs);
+    white-space: nowrap;
 }
 
 .section {
@@ -198,13 +242,32 @@
     background-color: var(--ui-background-selected) !important;
 }
 
+.weekendRow {
+    background-color: var(--calendar-weekend, #f5f7fa) !important;
+}
+
+.selectedRow.weekendRow {
+    background-color: color-mix(in srgb, var(--ui-background-selected) 80%, var(--calendar-weekend) 20%) !important;
+}
+
+/* Weekend rows with specific day types */
+.weekendRow.mandatoryRow,
+.weekendRow.wfhRow,
+.weekendRow.bridgeRow,
+.weekendRow.vacationRow,
+.weekendRow.activityRow {
+    background-color: color-mix(in srgb, var(--calendar-weekend) 60%, currentColor 40%) !important;
+}
+
 .checkboxHeader {
     width: 40px;
+    min-width: 40px;
     text-align: center;
 }
 
 .checkboxCell {
     width: 40px;
+    min-width: 40px;
     text-align: center;
     padding: var(--space-md) !important;
     cursor: pointer;
@@ -273,6 +336,11 @@
     color: var(--calendar-manual-override-activity-text);
 }
 
+.withIssueRow .typeBadge {
+    background-color: var(--error-primary);
+    color: var(--color-text-inverse);
+}
+
 .overrideRow .typeBadge {
     background-color: var(--ui-background-light);
     color: var(--ui-text-default);
@@ -291,6 +359,15 @@
     font-size: var(--font-size-sm);
 }
 
+.peopleCell {
+    font-size: var(--font-size-sm);
+    color: var(--ui-text-secondary);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .wfhPeople {
     color: var(--calendar-today-border);
     font-weight: 500;
@@ -307,104 +384,228 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     .summaryContainer {
-        padding: var(--space-md);
+        padding: var(--space-sm);
     }
 
     .title {
-        font-size: var(--font-size-xl);
-        margin-bottom: var(--space-lg);
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--space-md);
     }
 
     .sectionTitle {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
+    }
+
+    .daysSummaryHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+
+    .summaryActions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .selectButton,
+    .actionButton,
+    .deleteButton {
+        padding: var(--space-xxs) var(--space-xs);
+        font-size: var(--font-size-xxs);
+        min-height: var(--button-size-mobile);
+    }
+
+    /* Wrap tables in scrollable container */
+    .section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .statsTable,
     .daysTable {
         font-size: var(--font-size-sm);
+        min-width: 100%;
+        display: table;
     }
 
     .statsTable th,
     .statsTable td,
     .daysTable th,
     .daysTable td {
-        padding: var(--space-sm);
+        padding: var(--space-xs);
+        white-space: nowrap;
     }
 
     .typeCell {
-        width: 100px;
+        width: 80px;
+        min-width: 80px;
     }
 
     .typeBadge {
         font-size: var(--font-size-xxs);
         padding: var(--space-xxs) var(--space-xs);
     }
+
+    .checkboxHeader {
+        width: 30px;
+        min-width: 30px;
+    }
+
+    .checkboxCell {
+        width: 30px;
+        min-width: 30px;
+        padding: var(--space-xs) !important;
+    }
 }
 
 @media (max-width: 480px) {
     .summaryContainer {
-        padding: var(--space-sm);
+        padding: var(--space-xs);
     }
 
     .title {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
+        margin-bottom: var(--space-sm);
+    }
+
+    .section {
+        margin-bottom: var(--space-md);
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-xs);
+    }
+
+    .daysSummaryHeader {
+        gap: var(--space-xs);
+    }
+
+    .filterButtons {
+        gap: var(--space-xxs);
+    }
+
+    .filterButton {
+        padding: var(--space-xxs);
+        font-size: var(--font-size-xxs);
+        min-height: var(--button-size-mobile);
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .peopleCell {
+        font-size: var(--font-size-xxs);
+        max-width: 120px;
+    }
+
+    .summaryActions {
+        gap: var(--space-xxs);
+    }
+
+    .selectButton,
+    .actionButton,
+    .deleteButton {
+        padding: var(--space-xxs) var(--space-xs);
+        font-size: var(--font-size-xxs);
+        min-height: var(--button-size-mobile);
+    }
+
+    .selectedCount {
+        font-size: var(--font-size-xxs);
+        padding: 0 var(--space-xxs);
+    }
+
+    /* Keep tables as tables on mobile, make them horizontally scrollable */
+    .section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
     }
 
     .statsTable,
     .daysTable {
         font-size: var(--font-size-xs);
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .statsTable thead,
-    .statsTable tbody,
-    .statsTable tr,
-    .daysTable thead,
-    .daysTable tbody,
-    .daysTable tr {
-        display: block;
+        min-width: 100%;
+        display: table;
+        width: max-content;
     }
 
     .statsTable thead,
     .daysTable thead {
-        display: none;
+        display: table-header-group;
+    }
+
+    .statsTable tbody,
+    .daysTable tbody {
+        display: table-row-group;
     }
 
     .statsTable tr,
     .daysTable tr {
-        border: 1px solid var(--ui-border-default);
-        border-radius: var(--radius-sm);
-        margin-bottom: var(--space-xs);
-        padding: var(--space-xs);
-        background-color: var(--ui-background-light);
+        display: table-row;
     }
 
+    .statsTable th,
     .statsTable td,
+    .daysTable th,
     .daysTable td {
-        display: block;
-        text-align: right;
+        display: table-cell;
+        text-align: left;
         padding: var(--space-xs);
         border-bottom: 1px solid var(--ui-border-light);
+        vertical-align: middle;
+        white-space: nowrap;
     }
 
-    .statsTable td:before,
-    .daysTable td:before {
-        content: attr(data-label);
-        float: left;
-        font-weight: 600;
-        color: var(--ui-text-secondary);
+    .statsTable th,
+    .daysTable th {
+        font-size: var(--font-size-xxs);
+        padding: var(--space-xs);
+        background-color: var(--ui-background-light);
+        position: sticky;
+        top: 0;
+        z-index: 1;
     }
 
     .dateCell,
     .personName {
         font-weight: 600;
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-xs);
     }
 
     .typeCell {
         width: auto;
+        min-width: 70px;
+    }
+
+    .typeBadge {
+        font-size: var(--font-size-xxs);
+        padding: var(--space-xxs) var(--space-xs);
+    }
+
+    .noteCell {
+        font-size: var(--font-size-xxs);
+        max-width: 200px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .checkboxHeader {
+        width: 25px;
+        min-width: 25px;
+    }
+
+    .checkboxCell {
+        width: 25px;
+        min-width: 25px;
+        padding: var(--space-xxs) !important;
+    }
+
+    .checkbox {
+        width: 16px;
+        height: 16px;
+        line-height: 12px;
+        font-size: var(--font-size-xxs);
     }
 }
 

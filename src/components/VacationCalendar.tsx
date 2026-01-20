@@ -233,7 +233,7 @@ export const VacationCalendar = () => {
             {isLoadingHolidays && <span style={{ fontSize: '0.6em', marginLeft: '8px' }}>Loading...</span>}
           </h2>
         </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div className={styles.viewButtonsContainer}>
           {viewMode !== 'summary' && (
             <>
               <button
@@ -247,11 +247,11 @@ export const VacationCalendar = () => {
               </button>
               {selectionMode && selectedDates.size > 0 && (
                 <>
-                  <span style={{ fontSize: '0.9em', color: 'var(--ui-text-secondary)' }}>
-                    {selectedDates.size} selected
+                  <span className={styles.selectedCount}>
+                    {selectedDates.size}
                   </span>
                   <button
-                    className={classNames(styles.navButton)}
+                    className={classNames(styles.navButton, styles.actionButton)}
                     onClick={handleOpenBulkDialog}
                     aria-label="Edit selected days"
                     disabled={isLoadingHolidays}
@@ -260,14 +260,13 @@ export const VacationCalendar = () => {
                     Edit
                   </button>
                   <button
-                    className={classNames(styles.navButton)}
+                    className={classNames(styles.navButton, styles.deleteButton)}
                     onClick={handleBulkDelete}
                     aria-label="Delete selected days"
                     disabled={isLoadingHolidays}
                     title="Delete selected days"
-                    style={{ backgroundColor: 'var(--error-primary)', color: 'var(--color-text-inverse)' }}
                   >
-                    Delete
+                    Del
                   </button>
                 </>
               )}

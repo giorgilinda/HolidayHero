@@ -56,6 +56,15 @@
     color: var(--text-secondary);
 }
 
+.weekend {
+    background-color: var(--calendar-weekend, #f5f7fa) !important;
+}
+
+.weekend.otherMonth {
+    background-color: var(--calendar-weekend-other-month, #f0f2f5) !important;
+}
+
+
 .invalidDay {
     background-color: var(--other-month);
     opacity: 0.3;
@@ -185,6 +194,11 @@
     background-color: var(--calendar-mandatory-hover);
 }
 
+/* Weekend with MANDATORY - blend colors */
+.weekend.MANDATORY {
+    background-color: color-mix(in srgb, var(--calendar-weekend) 50%, var(--mandatory) 50%) !important;
+}
+
 .HIGH_VALUE {
     background-color: var(--highValue);
 }
@@ -193,12 +207,22 @@
     background-color: var(--calendar-high-value-hover);
 }
 
+/* Weekend with HIGH_VALUE - blend colors */
+.weekend.HIGH_VALUE {
+    background-color: color-mix(in srgb, var(--calendar-weekend) 50%, var(--highValue) 50%) !important;
+}
+
 .WFH_CANDIDATE {
     background-color: var(--workFromHome);
 }
 
 .WFH_CANDIDATE:hover {
     background-color: var(--calendar-wfh-hover);
+}
+
+/* Weekend with WFH_CANDIDATE - blend colors */
+.weekend.WFH_CANDIDATE {
+    background-color: color-mix(in srgb, var(--calendar-weekend) 50%, var(--workFromHome) 50%) !important;
 }
 
 .WORK {

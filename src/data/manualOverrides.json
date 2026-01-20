@@ -66,24 +66,6 @@
       }
     },
     {
-      "date": "2026-01-03",
-      "people": {
-        "mom": "vacation",
-        "dad": "vacation",
-        "leon": "vacation",
-        "lena": "vacation"
-      }
-    },
-    {
-      "date": "2026-01-04",
-      "people": {
-        "mom": "vacation",
-        "dad": "vacation",
-        "leon": "vacation",
-        "lena": "vacation"
-      }
-    },
-    {
       "date": "2026-01-05",
       "people": {
         "mom": "vacation",
@@ -163,20 +145,6 @@
       }
     },
     {
-      "date": "2026-04-04",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-04-05",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
       "date": "2026-04-07",
       "people": {
         "leon": "activity",
@@ -247,20 +215,6 @@
       }
     },
     {
-      "date": "2026-05-30",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-05-31",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
       "date": "2026-06-01",
       "people": {
         "leon": "activity",
@@ -317,20 +271,6 @@
       }
     },
     {
-      "date": "2026-09-05",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-09-06",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
       "date": "2026-09-07",
       "people": {
         "leon": "activity",
@@ -360,20 +300,6 @@
     },
     {
       "date": "2026-09-11",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-09-12",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-09-13",
       "people": {
         "leon": "activity",
         "lena": "activity"
@@ -423,13 +349,6 @@
     },
     {
       "date": "2026-12-24",
-      "people": {
-        "leon": "activity",
-        "lena": "activity"
-      }
-    },
-    {
-      "date": "2026-12-27",
       "people": {
         "leon": "activity",
         "lena": "activity"
