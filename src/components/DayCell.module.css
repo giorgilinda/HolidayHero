@@ -1,0 +1,336 @@
+/* Day Cell Styles */
+/* CSS variables are inherited from parent .container */
+.dayCell {
+    min-height: 120px;
+    min-width: 120px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px;
+    background-color: var(--workDay);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Compact mode for yearly view */
+.compact {
+    min-height: 30px !important;
+    min-width: 30px !important;
+    padding: 2px !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.compact .dayNumber {
+    font-size: 10px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.compact .dayContent {
+    display: none;
+}
+
+.dayCell:hover {
+    background-color: #f8f9fa;
+}
+
+.dayCell:nth-child(7n) {
+    border-right: none;
+}
+
+.dayNumber {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.otherMonth {
+    background-color: var(--other-month);
+}
+
+.otherMonth .dayNumber {
+    color: var(--text-secondary);
+}
+
+.invalidDay {
+    background-color: var(--other-month);
+    opacity: 0.3;
+}
+
+.today {
+    background-color: #e8f0fe;
+}
+
+.today .dayNumber {
+    color: var(--today-border);
+    font-weight: 600;
+}
+
+.today::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--today-border);
+}
+
+.dayContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    overflow: hidden;
+}
+
+.holidayName {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recommendation {
+    color: var(--text-secondary);
+    line-height: 1.3;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.manualOverrideInfo {
+    margin-bottom: 4px;
+    font-size: 10px;
+    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.manualOverridePerson {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+}
+
+.manualOverridePersonName {
+    font-weight: 500;
+    color: var(--manual-override-border);
+    font-size: 9px;
+}
+
+.manualOverridePersonType {
+    font-size: 10px;
+}
+
+.manualOverridePersonActivity {
+    color: #856404;
+}
+
+.wfhSuggestion {
+    margin-top: 4px;
+    padding: 4px 6px;
+    background-color: #e0f2fe;
+    border: 1px solid #0ea5e9;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 9px;
+    line-height: 1.3;
+}
+
+.wfhSuggestionIcon {
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.wfhSuggestionText {
+    color: #0c4a6e;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Tag-based background colors */
+.SKIP {
+    background-color: var(--holiday);
+}
+
+.SKIP:hover {
+    background-color: #d1d5db;
+}
+
+.MANDATORY {
+    background-color: var(--mandatory);
+}
+
+.MANDATORY:hover {
+    background-color: #fc8181;
+}
+
+.HIGH_VALUE {
+    background-color: var(--highValue);
+}
+
+.HIGH_VALUE:hover {
+    background-color: #fef08a;
+}
+
+.WFH_CANDIDATE {
+    background-color: var(--workFromHome);
+}
+
+.WFH_CANDIDATE:hover {
+    background-color: #fbbf24;
+}
+
+.WORK {
+    background-color: var(--workDay);
+}
+
+.manualOverride {
+    background-color: var(--manual-override) !important;
+    border: 2px solid var(--manual-override-border) !important;
+}
+
+.manualOverrideActivity {
+    background-color: var(--manual-override-activity) !important;
+    border: 2px solid var(--manual-override-activity-border) !important;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .dayCell {
+        min-height: 60px;
+        min-width: 0;
+        width: 100%;
+        padding: 3px;
+    }
+
+    .dayCell:nth-child(7n) {
+        border-right: 1px solid var(--border-color);
+    }
+
+    .dayNumber {
+        font-size: 10px;
+        margin-bottom: 2px;
+    }
+
+    .dayContent {
+        font-size: 8px;
+        gap: 2px;
+    }
+
+    .holidayName {
+        font-size: 8px;
+    }
+
+    .recommendation {
+        font-size: 7px;
+        line-height: 1.2;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
+
+    .wfhSuggestion {
+        padding: 2px 3px;
+        font-size: 7px;
+        margin-top: 2px;
+    }
+
+    .wfhSuggestionIcon {
+        font-size: 8px;
+    }
+
+    .manualOverrideInfo {
+        font-size: 7px;
+        gap: 1px;
+        margin-bottom: 2px;
+    }
+
+    .manualOverridePerson {
+        gap: 2px;
+    }
+
+    .manualOverridePersonName {
+        font-size: 7px;
+    }
+
+    .manualOverridePersonType {
+        font-size: 8px;
+    }
+
+    .compact {
+        min-height: 18px !important;
+        min-width: 18px !important;
+        padding: 1px !important;
+    }
+
+    .compact .dayNumber {
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dayCell {
+        min-height: 50px;
+        padding: 2px;
+    }
+
+    .dayNumber {
+        font-size: 9px;
+    }
+
+    .dayContent {
+        font-size: 7px;
+    }
+
+    .holidayName {
+        font-size: 7px;
+    }
+
+    .recommendation {
+        font-size: 6px;
+    }
+
+    .wfhSuggestion {
+        padding: 1px 2px;
+        font-size: 6px;
+    }
+
+    .manualOverrideInfo {
+        font-size: 6px;
+    }
+
+    .manualOverridePersonName {
+        font-size: 6px;
+    }
+
+    .compact {
+        min-height: 15px !important;
+        min-width: 15px !important;
+        padding: 0 !important;
+    }
+
+    .compact .dayNumber {
+        font-size: 6px;
+    }
+}
+
