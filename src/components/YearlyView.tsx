@@ -15,6 +15,8 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
   dayDataMap,
   people,
   onDayClick,
+  selectedDates = new Set(),
+  selectionMode = false,
 }) => {
 
   const yearlyCalendarData = useMemo(() => {
@@ -194,23 +196,31 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
             const maxDays = lastDayOfMonth.getDate();
             return (
               <div key={month.monthIndex} className={styles.yearlyMonthRow}>
-                {month.days.map((calendarDay, dayIndex) => {
-                  const dayNumber = dayIndex + 1;
-                  const isValidDay = dayNumber <= maxDays;
-                  return (
-                    <div key={`${month.monthIndex}-${dayIndex}`} className={styles.yearlyDayCell}>
-                      <DayCell
-                        calendarDay={calendarDay}
-                        people={people}
-                        isCurrentMonth={true}
-                        isValidDay={isValidDay}
-                        onClick={() => onDayClick(calendarDay.date)}
-                        className={styles.yearlyDayCellContent}
-                        compact={true}
-                      />
-                    </div>
-                  );
-                })}
+                        {month.days.map((calendarDay, dayIndex) => {
+                          const dayNumber = dayIndex + 1;
+                          const isValidDay = dayNumber <= maxDays;
+                          const year = calendarDay.date.getFullYear();
+                          const monthNum = String(calendarDay.date.getMonth() + 1).padStart(2, '0');
+                          const dayNum = String(calendarDay.date.getDate()).padStart(2, '0');
+                          const dateStr = `${year}-${monthNum}-${dayNum}`;
+                          const isSelected = selectionMode && isValidDay && selectedDates.has(dateStr);
+                          
+                          return (
+                            <div key={`${month.monthIndex}-${dayIndex}`} className={styles.yearlyDayCell}>
+                              <DayCell
+                                calendarDay={calendarDay}
+                                people={people}
+                                isCurrentMonth={true}
+                                isValidDay={isValidDay}
+                                onClick={() => onDayClick(calendarDay.date)}
+                                className={styles.yearlyDayCellContent}
+                                compact={true}
+                                isSelected={isSelected}
+                                selectionMode={selectionMode}
+                              />
+                            </div>
+                          );
+                        })}
               </div>
             );
           })}

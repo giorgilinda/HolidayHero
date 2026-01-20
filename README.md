@@ -4,41 +4,93 @@ A smart vacation planning engine that balances local holidays,
 school closures, and WFH flexibility to find the best days for PTO.
 
 ## Key Features
-- **The Brain**: TypeScript logic to rate days from 1-10.
-- **Childcare Guard**: Automatically flags days where school is closed.
-- **Bridge Finder**: Detects high-efficiency days (1 PTO = 4 Day Weekend).
-- **Spouse Sync**: Real-time coordination via Supabase.
 
-## 🚀 Features
+### 🧠 Smart Day Rating System
+- **The Brain**: TypeScript logic that rates each day from 0-10 based on multiple factors
+- **Day Tags**: Automatically categorizes days as MANDATORY, HIGH_VALUE, WFH_CANDIDATE, SKIP, or WORK
+- **Intelligent Recommendations**: Provides context-aware suggestions for each day
+
+### 🎓 School & Holiday Integration
+- **Public Holiday Detection**: Automatically fetches and displays public holidays
+- **School Holiday Detection**: Integrates school holiday calendars
+- **Childcare Guard**: Automatically flags days where school is closed (mandatory PTO)
+- **Bridge Day Finder**: Detects high-efficiency days where 1 PTO = 4 Day Weekend
+
+### 🏠 Work-From-Home Suggestions
+- **WFH Recommendations**: Suggests WFH when school is closed, kids can stay home, and mandatory days are below threshold
+- **Per-Person WFH Settings**: Configure WFH ability for each adult individually
+- **Childcare Availability**: Track which adults are available for childcare
+
+### 📅 Calendar Views
+- **Monthly View**: Detailed day-by-day view with all information
+- **Yearly View**: Compact overview showing the entire year at a glance
+- **Easy Navigation**: Quick month/year navigation with "Today" button
+
+### ✏️ Manual Overrides
+- **Per-Person Overrides**: Set vacation, WFH, or activity for each person individually
+- **Bulk Updates**: Select multiple days and apply the same override to all at once
+- **Persistent Storage**: All overrides saved to local API and persist across sessions
+- **Auto-Generation**: Automatically creates activity overrides for school holidays
+
+### 📱 Mobile-First Design
+- **Fully Responsive**: Optimized for mobile, tablet, and desktop
+- **Touch-Friendly**: Large touch targets and mobile-optimized dialogs
+- **Icon-Only Mode**: On mobile, buttons show only icons for compact display
+- **Bottom Sheet Dialogs**: Mobile-friendly dialog presentation
+
+### 🎨 Customizable Theme
+- **Centralized Variables**: All colors, spacing, and sizes in one theme file
+- **Easy Customization**: Change the entire app's appearance by editing CSS variables
+- **TypeScript Constants**: Theme values available in TSX files via constants
+
+## 🛠️ Technical Stack
 
 - **Next.js 15** - Latest version with App Router
 - **TypeScript** - Type-safe development
-- **Jest** - Unit and integration testing with coverage
-- **ESLint** - Code quality and consistency
-- **CSS Modules** - Scoped styling
-- **Theme System** - Customizable CSS variables
-- **Dark Mode Support** - Automatic dark mode via prefers-color-scheme
-- **Mobile-First** - Responsive design out of the box
-- **Production Ready** - Security headers, optimized builds
+- **React 19** - Latest React features
+- **CSS Modules** - Scoped component styling
+- **Custom Hooks** - Reusable logic (`useCalendarData`, `useManualOverrides`)
+- **API Routes** - Server-side endpoints for holidays and overrides
+- **Local Storage** - Client-side persistence for deleted dates
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/              # Next.js App Router pages
-│   ├── layout.tsx   # Root layout
-│   ├── page.tsx     # Home page
-│   └── globals.css  # Global styles
-├── components/       # Reusable React components
-├── pages/           # API routes (Pages Router)
-│   └── api/
-├── utils/           # Utility functions
-├── hooks/           # Custom React hooks
-├── contexts/        # React contexts
-├── services/        # External service integrations
-└── styles/          # Global styles and theme
-tests/               # Test files
-public/              # Static assets
+├── app/                    # Next.js App Router pages
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page
+│   ├── globals.css        # Global styles
+│   └── templates/         # Page templates
+│       └── BaseTemplate.tsx
+├── components/             # React components
+│   ├── VacationCalendar.tsx    # Main calendar component
+│   ├── MonthlyView.tsx         # Monthly calendar view
+│   ├── YearlyView.tsx          # Yearly calendar view
+│   ├── DayCell.tsx             # Individual day cell
+│   ├── DayEditDialog.tsx       # Edit dialog for day overrides
+│   └── calendarTypes.ts        # Shared TypeScript types
+├── pages/api/             # API routes
+│   ├── holidays/          # Holiday data endpoints
+│   │   ├── public.ts      # Public holidays API
+│   │   └── school.ts      # School holidays API
+│   └── overrides.ts       # Manual overrides API
+├── hooks/                  # Custom React hooks
+│   ├── useCalendarData.ts      # Holiday data fetching
+│   └── useManualOverrides.ts   # Override management
+├── services/               # External service integrations
+│   └── openHolidaysApi.ts  # OpenHolidays API client
+├── utils/                  # Utility functions
+│   ├── brain.ts            # Day rating logic
+│   ├── constants.ts         # App constants
+│   └── themeConstants.ts   # Theme constants for TSX
+├── config/                 # Configuration files
+│   ├── people.json         # People and preferences
+│   └── userPreferences.ts  # Preferences loader
+├── data/                   # Data files
+│   └── manualOverrides.json # Stored overrides
+└── styles/                 # Global styles
+    └── theme.css           # Theme variables
 ```
 
 ## 🛠️ Getting Started
@@ -78,47 +130,97 @@ npm start
 
 ## 🎨 Theming
 
-The boilerplate includes a comprehensive theme system using CSS variables. Customize colors, spacing, typography, and more in `src/styles/theme.css`:
+HolidayHero uses a comprehensive theme system with CSS variables. All colors, spacing, typography, and component sizes are centralized in `src/styles/theme.css`:
 
 ```css
 :root {
   --color-primary: #0070f3;
-  --color-secondary: #7c3aed;
+  --calendar-holiday: #e2e8f0;
+  --calendar-mandatory: #feb2b2;
+  --calendar-work-from-home: #FFC067;
   /* ... more variables */
 }
 ```
 
-Dark mode is automatically enabled based on system preferences. Customize dark mode styles in the `@media (prefers-color-scheme: dark)` section.
+### Theme Categories
+- **Calendar Colors**: Holiday, mandatory, WFH, and activity colors
+- **UI Colors**: Backgrounds, borders, text colors
+- **Spacing**: Consistent spacing scale (xs, sm, md, lg, xl, 2xl)
+- **Typography**: Font sizes for desktop, tablet, and mobile
+- **Breakpoints**: Mobile (480px), tablet (768px), desktop (1200px)
+- **Component Sizes**: Button sizes, calendar cell sizes, yearly view dimensions
 
-## 📝 Example Components
+For TypeScript/TSX files, use `src/utils/themeConstants.ts` to access theme values.
 
-The boilerplate includes a few example components to get you started:
+## 📝 Core Components
 
-- **Button** - Accessible button component with variants
-- **Card** - Card container component
+### VacationCalendar
+The main calendar component that orchestrates all views and state management.
 
-These serve as examples of best practices for component structure and CSS Modules usage.
+### MonthlyView
+Detailed monthly calendar view showing:
+- Day ratings and recommendations
+- Holiday information
+- Manual overrides
+- WFH suggestions
 
-## 🧪 Testing
+### YearlyView
+Compact yearly overview showing:
+- All 12 months in a single view
+- Color-coded day status
+- Quick visual reference
 
-Tests are located in the `tests/` directory. Example tests are included for:
+### DayCell
+Individual day cell component used by both views, with:
+- Compact mode for yearly view
+- Selection state for bulk operations
+- Visual indicators for different day types
 
-- Utility functions (`tests/utils.test.ts`)
-- Components (`tests/components/Button.test.tsx`)
+### DayEditDialog
+Modal dialog for editing day overrides:
+- Single day editing
+- Bulk editing for multiple selected days
+- Per-person override management
+- Mobile-optimized interface
 
-### Writing Tests
+## ⚙️ Configuration
 
-```typescript
-import { render, screen } from "@testing-library/react";
-import { Button } from "@/components/Button";
+### People & Preferences
 
-describe("Button", () => {
-  it("renders correctly", () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByText("Click me")).toBeInTheDocument();
-  });
-});
+Configure your family and preferences in `src/config/people.json`:
+
+```json
+{
+  "people": [
+    {
+      "id": "mom",
+      "name": "Linda",
+      "isChild": false,
+      "availability": true,
+      "wfhAbility": true
+    },
+    {
+      "id": "leon",
+      "name": "Leon",
+      "isChild": true
+    }
+  ],
+  "preferences": {
+    "maxMandatoryDaysForWfhSuggestion": 2
+  }
+}
 ```
+
+### Holiday API Configuration
+
+Configure holiday API settings in `src/utils/constants.ts`:
+- Country code
+- Subdivision code
+- Language code
+
+### Manual Overrides
+
+Overrides are stored in `src/data/manualOverrides.json` and managed via the API at `/api/overrides`.
 
 ## 🔧 Configuration
 
@@ -151,28 +253,28 @@ The project can be deployed to any platform that supports Next.js:
 - Cloudflare Pages
 - Self-hosted (Node.js)
 
-## 📦 What's Included
+## 📦 Features Summary
 
-- ✅ Next.js 15 with App Router
-- ✅ TypeScript configuration
-- ✅ Jest with React Testing Library
-- ✅ ESLint configuration
-- ✅ CSS Modules with theme system
-- ✅ Dark mode support
-- ✅ Security headers
-- ✅ Example components and tests
+- ✅ Smart day rating system (0-10 scale)
+- ✅ Public and school holiday integration
+- ✅ Bridge day detection
+- ✅ WFH suggestions based on childcare
+- ✅ Monthly and yearly calendar views
+- ✅ Manual overrides (vacation, WFH, activity)
+- ✅ Bulk update functionality
 - ✅ Mobile-first responsive design
-- ✅ Production optimizations
+- ✅ Comprehensive theme system
+- ✅ Persistent override storage
+- ✅ Auto-generation of school holiday overrides
 
-## 🔮 Next Steps
+## 🔮 Future Enhancements
 
-- Add state management (Redux, Zustand, etc.)
-- Set up internationalization (i18n)
-- Add Storybook for component development
-- Configure CI/CD pipeline
-- Add end-to-end testing (Playwright, Cypress)
-- Set up authentication
-- Add a UI library (Tailwind CSS, Material-UI, etc.)
+- Export calendar to iCal/Google Calendar
+- Share calendar with family members
+- Vacation statistics and analytics
+- Multi-year planning
+- Integration with work calendar systems
+- Push notifications for upcoming holidays
 
 ## 📄 License
 
@@ -180,7 +282,11 @@ MIT
 
 ## 🤝 Contributing
 
-This is a boilerplate template. Feel free to fork and customize for your needs!
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+MIT
 
 ---
 

@@ -13,6 +13,8 @@ export const MonthlyView: React.FC<CalendarViewProps> = ({
   dayDataMap,
   people,
   onDayClick,
+  selectedDates = new Set(),
+  selectionMode = false,
 }) => {
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const monthIndex = currentMonth;
@@ -135,16 +137,24 @@ export const MonthlyView: React.FC<CalendarViewProps> = ({
       <div className={styles.weekGrid}>
         {calendarDays.map((calendarDay, index) => {
           const isCurrentMonth = calendarDay.date.getMonth() === monthIndex;
-          return (
-            <DayCell
-              key={`${calendarDay.date.toISOString()}-${index}`}
-              calendarDay={calendarDay}
-              people={people}
-              isCurrentMonth={isCurrentMonth}
-              isValidDay={true}
-              onClick={() => onDayClick(calendarDay.date)}
-            />
-          );
+                  const year = calendarDay.date.getFullYear();
+                  const month = String(calendarDay.date.getMonth() + 1).padStart(2, '0');
+                  const day = String(calendarDay.date.getDate()).padStart(2, '0');
+                  const dateStr = `${year}-${month}-${day}`;
+                  const isSelected = selectionMode && selectedDates.has(dateStr);
+                  
+                  return (
+                    <DayCell
+                      key={`${calendarDay.date.toISOString()}-${index}`}
+                      calendarDay={calendarDay}
+                      people={people}
+                      isCurrentMonth={isCurrentMonth}
+                      isValidDay={true}
+                      onClick={() => onDayClick(calendarDay.date)}
+                      isSelected={isSelected}
+                      selectionMode={selectionMode}
+                    />
+                  );
         })}
       </div>
     </div>

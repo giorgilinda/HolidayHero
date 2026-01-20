@@ -31,5 +31,7 @@ export interface CalendarViewProps {
   dayDataMap: Map<string, DayData>;
   people: Person[];
   onDayClick: (date: Date) => void;
+  selectedDates?: Set<string>;
+  selectionMode?: boolean;
 }
 

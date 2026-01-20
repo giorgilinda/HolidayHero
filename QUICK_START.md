@@ -2,24 +2,20 @@
 
 ## 🚀 Get Started in 3 Steps
 
-### 1. Copy this boilerplate to your new project
+### 1. Clone the Repository
 
 ```bash
-# Copy the entire boilerplate folder
-cp -r /home/linda/personal/nextjs-boilerplate /path/to/your/new-project
-
-# Or clone from GitHub (after you push it)
-git clone <your-github-repo-url> my-new-project
-cd my-new-project
+git clone <your-github-repo-url> holiday-hero
+cd holiday-hero
 ```
 
-### 2. Install dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Start developing
+### 3. Start Developing
 
 ```bash
 npm run dev
@@ -27,50 +23,52 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📋 What to Customize
+## 📋 Initial Setup
 
-### Project Name
+### 1. Configure Your Family
 
-1. Update `package.json`:
+Edit `src/config/people.json` to add your family members:
 
-   - Change `name` to your project name
-   - Update `description`
-
-2. Update `src/app/layout.tsx`:
-   - Change `title` and `description` in metadata
-   - Update favicon emoji
-
-### Colors & Theme
-
-Edit `src/styles/theme.css` to customize colors:
-
-```css
-:root {
-  --color-primary: #your-color;
-  --color-secondary: #your-color;
-  /* ... */
+```json
+{
+  "people": [
+    {
+      "id": "mom",
+      "name": "Your Name",
+      "isChild": false,
+      "availability": true,
+      "wfhAbility": true
+    },
+    {
+      "id": "child1",
+      "name": "Child Name",
+      "isChild": true
+    }
+  ],
+  "preferences": {
+    "maxMandatoryDaysForWfhSuggestion": 2
+  }
 }
 ```
 
-### Add New Pages
+### 2. Configure Holiday API
 
-Create new files in `src/app/`:
+Update `src/utils/constants.ts` with your location:
+- `HOLIDAY_COUNTRY_CODE`: Your country code (e.g., "DE")
+- `HOLIDAY_SUBDIVISION_CODE`: Your state/region code
+- `HOLIDAY_LANGUAGE_CODE`: Language for holiday names
 
-- `about/page.tsx` → `/about`
-- `contact/page.tsx` → `/contact`
+### 3. Customize Theme (Optional)
 
-### Add API Routes
+Edit `src/styles/theme.css` to customize colors and styling:
 
-Create files in `src/pages/api/`:
-
-- `src/pages/api/users.ts` → `/api/users`
-
-### Add Components
-
-Create components in `src/components/`:
-
-- `src/components/Header.tsx`
-- `src/components/Header.module.css`
+```css
+:root {
+  --calendar-holiday: #your-color;
+  --calendar-mandatory: #your-color;
+  /* ... */
+}
+```
 
 ## 🧪 Run Tests
 
@@ -87,19 +85,35 @@ npm start
 
 ## 📚 Next Steps
 
-- [ ] Update README.md with your project details
-- [ ] Customize theme colors
-- [ ] Add your first feature
-- [ ] Write tests for your code
-- [ ] Deploy to Vercel
+- [ ] Configure your family in `src/config/people.json`
+- [ ] Set up holiday API location in `src/utils/constants.ts`
+- [ ] Customize theme colors in `src/styles/theme.css` (optional)
+- [ ] Start planning your vacations! 🏖️
+- [ ] Deploy to Vercel or your preferred platform
 
-## 💡 Tips
+## 💡 Usage Tips
 
-- Use CSS Modules for component-specific styles
-- Leverage the theme variables for consistent styling
-- Write tests alongside your code
-- Use TypeScript for type safety
-- Follow the existing component patterns
+### Using the Calendar
+
+1. **View Modes**: Switch between Monthly and Yearly views using the buttons in the header
+2. **Single Day Edit**: Click any day to open the edit dialog
+3. **Bulk Updates**: 
+   - Click "Select" to enter selection mode
+   - Click multiple days to select them
+   - Click "Edit" to apply the same override to all selected days
+   - Click "Delete" to remove overrides from all selected days
+4. **Day Types**: 
+   - 🏖️ Vacation: Mark days as vacation
+   - 🏠 WFH: Mark days as work from home
+   - 🎨 Activity: Mark days with activities (e.g., school activities)
+
+### Understanding Day Ratings
+
+- **MANDATORY** (Red): School is closed - you need to take PTO
+- **WFH_CANDIDATE** (Orange): School is closed but WFH is suggested
+- **HIGH_VALUE** (Yellow): Bridge day - great efficiency (1 PTO = 4 days)
+- **SKIP** (Gray): Public holiday - no PTO needed
+- **WORK** (White): Regular work day
 
 ## 🆘 Need Help?
 

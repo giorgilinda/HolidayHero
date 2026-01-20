@@ -18,20 +18,24 @@ export interface ManualOverride {
 interface DayEditDialogProps {
   isOpen: boolean;
   date: Date | null;
+  dates?: string[] | null; // For bulk edit
   people: Person[];
   existingOverride: ManualOverride | null;
   onClose: () => void;
   onSave: (override: ManualOverride) => void;
+  onBulkSave?: (overrides: ManualOverride[]) => void;
   onDelete: () => void;
 }
 
 export const DayEditDialog: React.FC<DayEditDialogProps> = ({
   isOpen,
   date,
+  dates,
   people,
   existingOverride,
   onClose,
   onSave,
+  onBulkSave,
   onDelete,
 }) => {
   const [peopleTypes, setPeopleTypes] = useState<Record<string, 'vacation' | 'wfh' | 'activity'>>({});
@@ -44,20 +48,24 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
     }
   }, [isOpen, existingOverride]);
 
-  if (!isOpen || !date) return null;
+  if (!isOpen) return null;
 
-  // Format date as YYYY-MM-DD to match calendar format (using local timezone)
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const dateString = `${year}-${month}-${day}`;
+  const isBulkEdit = dates && dates.length > 0;
   
-  const formattedDate = date.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  // Format date(s) for display
+  let formattedDate = '';
+  if (isBulkEdit) {
+    formattedDate = `${dates.length} day${dates.length > 1 ? 's' : ''}`;
+  } else if (date) {
+    formattedDate = date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } else {
+    return null;
+  }
 
   const handlePersonToggle = (personId: string, type: 'vacation' | 'wfh' | 'activity') => {
     setPeopleTypes(prev => {
@@ -80,10 +88,23 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
       return;
     }
 
-    onSave({
-      date: dateString,
-      people: peopleTypes,
-    });
+    if (isBulkEdit && onBulkSave) {
+      // Create override for each selected date
+      const overrides: ManualOverride[] = dates!.map(dateStr => ({
+        date: dateStr,
+        people: peopleTypes,
+      }));
+      onBulkSave(overrides);
+    } else if (date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      onSave({
+        date: dateString,
+        people: peopleTypes,
+      });
+    }
     onClose();
   };
 
@@ -98,7 +119,7 @@ export const DayEditDialog: React.FC<DayEditDialogProps> = ({
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2>Edit Day: {formattedDate}</h2>
+          <h2>{isBulkEdit ? 'Bulk Edit:' : 'Edit Day:'} {formattedDate}</h2>
           <button className={styles.closeButton} onClick={onClose} aria-label="Close">
             ×
           </button>

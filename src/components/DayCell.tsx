@@ -14,6 +14,8 @@ interface DayCellProps {
   onClick: () => void;
   className?: string;
   compact?: boolean; // For yearly view - show only day number and color
+  isSelected?: boolean;
+  selectionMode?: boolean;
 }
 
 export const DayCell: React.FC<DayCellProps> = ({
@@ -24,6 +26,8 @@ export const DayCell: React.FC<DayCellProps> = ({
   onClick,
   className,
   compact = false,
+  isSelected = false,
+  selectionMode = false,
 }) => {
   const isToday = isValidDay && calendarDay.date.toDateString() === new Date().toDateString();
   
@@ -40,6 +44,8 @@ export const DayCell: React.FC<DayCellProps> = ({
           Object.values(calendarDay.dayData.manualOverride.people).includes('activity') &&
           dayCellStyles.manualOverrideActivity,
         compact && dayCellStyles.compact,
+        isSelected && dayCellStyles.selected,
+        selectionMode && dayCellStyles.selectionMode,
         className
       )}
       onClick={isValidDay ? onClick : undefined}

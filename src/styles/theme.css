@@ -206,17 +206,3 @@
   --button-arrow-font-size-tablet: 18px;
   --button-arrow-font-size-mobile: 16px;
 }
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #111827;
-    --color-background-alt: #1f2937;
-    --color-surface: #1f2937;
-    --color-border: #374151;
-    --color-border-light: #4b5563;
-    --color-text-primary: #f9fafb;
-    --color-text-secondary: #d1d5db;
-    --color-text-tertiary: #9ca3af;
-  }
-}

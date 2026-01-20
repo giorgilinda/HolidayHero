@@ -215,6 +215,49 @@
     border: 2px solid var(--manual-override-activity-border) !important;
 }
 
+.selectionMode {
+    position: relative;
+}
+
+.selectionMode::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--ui-border-default);
+    border-radius: 2px;
+    background-color: var(--color-background);
+    z-index: 10;
+}
+
+.selected {
+    border: 2px solid var(--button-primary) !important;
+    box-shadow: 0 0 0 2px var(--ui-background-selected);
+}
+
+.selected.selectionMode::before {
+    background-color: var(--button-primary);
+    border-color: var(--button-primary);
+}
+
+.selected.selectionMode::after {
+    content: '✓';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-inverse);
+    font-size: 8px;
+    font-weight: bold;
+    z-index: 11;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
     .dayCell {

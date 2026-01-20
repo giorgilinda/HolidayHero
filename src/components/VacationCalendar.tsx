@@ -20,6 +20,8 @@ export const VacationCalendar = () => {
   const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('monthly');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
   // Get calendar data (holidays, dayDataMap) - this will fetch holidays
   // Start with empty overrides, will update after overrides are loaded
@@ -98,8 +100,25 @@ export const VacationCalendar = () => {
   }, [currentYear]);
 
   const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
-    setDialogOpen(true);
+    if (selectionMode) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      setSelectedDates(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(dateStr)) {
+          newSet.delete(dateStr);
+        } else {
+          newSet.add(dateStr);
+        }
+        return newSet;
+      });
+    } else {
+      setSelectedDate(date);
+      setDialogOpen(true);
+    }
   };
 
   const getSelectedDateOverride = (): ManualOverride | null => {
@@ -115,6 +134,14 @@ export const VacationCalendar = () => {
     handleSaveOverride(override);
   };
 
+  const handleBulkSave = (overrides: ManualOverride[]) => {
+    overrides.forEach(override => {
+      handleSaveOverride(override);
+    });
+    setSelectedDates(new Set());
+    setSelectionMode(false);
+  };
+
   const handleDelete = () => {
     if (selectedDate) {
       const year = selectedDate.getFullYear();
@@ -123,6 +150,32 @@ export const VacationCalendar = () => {
       const dateStr = `${year}-${month}-${day}`;
       handleDeleteOverride(dateStr);
     }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedDates.size === 0) return;
+    if (window.confirm(`Are you sure you want to delete overrides for ${selectedDates.size} day(s)?`)) {
+      selectedDates.forEach(dateStr => {
+        handleDeleteOverride(dateStr);
+      });
+      setSelectedDates(new Set());
+      setSelectionMode(false);
+    }
+  };
+
+  const handleToggleSelectionMode = () => {
+    setSelectionMode(prev => !prev);
+    if (selectionMode) {
+      setSelectedDates(new Set());
+    }
+  };
+
+  const handleOpenBulkDialog = () => {
+    if (selectedDates.size === 0) {
+      alert('Please select at least one day');
+      return;
+    }
+    setDialogOpen(true);
   };
 
   return (
@@ -152,6 +205,41 @@ export const VacationCalendar = () => {
           </h2>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            className={classNames(styles.navButton, selectionMode && styles.activeViewButton)}
+            onClick={handleToggleSelectionMode}
+            aria-label="Toggle selection mode"
+            disabled={isLoadingHolidays}
+            title="Toggle selection mode"
+          >
+            {selectionMode ? '✓ Select' : 'Select'}
+          </button>
+          {selectionMode && selectedDates.size > 0 && (
+            <>
+              <span style={{ fontSize: '0.9em', color: 'var(--ui-text-secondary)' }}>
+                {selectedDates.size} selected
+              </span>
+              <button
+                className={classNames(styles.navButton)}
+                onClick={handleOpenBulkDialog}
+                aria-label="Edit selected days"
+                disabled={isLoadingHolidays}
+                title="Edit selected days"
+              >
+                Edit
+              </button>
+              <button
+                className={classNames(styles.navButton)}
+                onClick={handleBulkDelete}
+                aria-label="Delete selected days"
+                disabled={isLoadingHolidays}
+                title="Delete selected days"
+                style={{ backgroundColor: 'var(--error-primary)', color: 'var(--color-text-inverse)' }}
+              >
+                Delete
+              </button>
+            </>
+          )}
           <button
             className={classNames(styles.navButton, viewMode === 'monthly' && styles.activeViewButton)}
             onClick={() => setViewMode('monthly')}
@@ -198,6 +286,8 @@ export const VacationCalendar = () => {
           dayDataMap={finalDayDataMap}
           people={people}
           onDayClick={handleDayClick}
+          selectedDates={selectedDates}
+          selectionMode={selectionMode}
         />
       ) : (
         <YearlyView
@@ -206,15 +296,25 @@ export const VacationCalendar = () => {
           dayDataMap={finalDayDataMap}
           people={people}
           onDayClick={handleDayClick}
+          selectedDates={selectedDates}
+          selectionMode={selectionMode}
         />
       )}
       <DayEditDialog
         isOpen={dialogOpen}
-        date={selectedDate}
+        date={selectionMode && selectedDates.size > 0 ? null : selectedDate}
+        dates={selectionMode ? Array.from(selectedDates) : null}
         people={people}
-        existingOverride={getSelectedDateOverride()}
-        onClose={() => setDialogOpen(false)}
+        existingOverride={selectionMode ? null : getSelectedDateOverride()}
+        onClose={() => {
+          setDialogOpen(false);
+          if (selectionMode) {
+            setSelectedDates(new Set());
+            setSelectionMode(false);
+          }
+        }}
         onSave={handleSave}
+        onBulkSave={handleBulkSave}
         onDelete={handleDelete}
       />
     </div>

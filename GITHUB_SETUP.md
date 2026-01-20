@@ -1,26 +1,26 @@
 # GitHub Setup Guide
 
-## 📤 Push This Boilerplate to GitHub
+## 📤 Push HolidayHero to GitHub
 
 ### Step 1: Create a New Repository on GitHub
 
 1. Go to [GitHub](https://github.com) and create a new repository
-2. Name it something like `nextjs-boilerplate` or `my-nextjs-starter`
+2. Name it something like `holiday-hero` or `vacation-planner`
 3. **Don't** initialize with README, .gitignore, or license (we already have these)
 
 ### Step 2: Initialize Git and Push
 
 ```bash
-cd /home/linda/personal/nextjs-boilerplate
+cd /path/to/holiday-hero
 
-# Initialize git repository
+# Initialize git repository (if not already initialized)
 git init
 
 # Add all files
 git add .
 
 # Create initial commit
-git commit -m "Initial commit: Next.js boilerplate"
+git commit -m "Initial commit: HolidayHero vacation planning app"
 
 # Add your GitHub repository as remote
 git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
@@ -36,15 +36,18 @@ Visit your repository on GitHub and confirm all files are there.
 
 ## 🔄 Using This Boilerplate for New Projects
 
-### Option 1: Clone and Customize
+### Option 1: Clone and Use
 
 ```bash
-# Clone the boilerplate
-git clone https://github.com/YOUR_USERNAME/nextjs-boilerplate.git my-new-project
-cd my-new-project
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/holiday-hero.git
+cd holiday-hero
 
 # Install dependencies
 npm install
+
+# Configure your family in src/config/people.json
+# Configure holiday API in src/utils/constants.ts
 
 # Start developing
 npm run dev
@@ -52,10 +55,11 @@ npm run dev
 
 ### Option 2: Use GitHub Template
 
-1. Go to your boilerplate repository on GitHub
+1. Go to your HolidayHero repository on GitHub
 2. Click "Use this template" button
 3. Create a new repository from the template
 4. Clone your new repository
+5. Follow the setup steps in QUICK_START.md
 
 ### Option 3: Download ZIP
 
@@ -64,18 +68,15 @@ npm run dev
 3. Extract and rename the folder
 4. Follow Option 1 steps starting from `npm install`
 
-## 📋 Checklist for New Projects
+## 📋 Checklist for New Setup
 
-After cloning this boilerplate, make sure to:
+After cloning HolidayHero, make sure to:
 
-- [ ] Update `package.json` name, version, and description
-- [ ] Update `src/app/layout.tsx` metadata (title, description)
-- [ ] Customize `src/styles/theme.css` colors
-- [ ] Update README.md with your project details
-- [ ] Add environment variables to `.env.local` (see env.example)
-- [ ] Delete or modify example components/tests as needed
-- [ ] Add your first feature!
-- [ ] Update this file or delete it if not needed
+- [ ] Configure your family in `src/config/people.json`
+- [ ] Set up holiday API location in `src/utils/constants.ts`
+- [ ] (Optional) Customize `src/styles/theme.css` colors
+- [ ] Test the calendar with your local holidays
+- [ ] Deploy to your preferred platform
 
 ## 🔗 Useful GitHub Features
 
@@ -128,4 +129,4 @@ const nextConfig: NextConfig = {
 
 ## 🎉 You're Ready!
 
-Your boilerplate is now on GitHub and ready to be cloned for new projects!
+HolidayHero is now on GitHub and ready to use! Follow the QUICK_START.md guide to configure it for your family.
