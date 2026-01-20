@@ -26,7 +26,7 @@ export interface DayContext {
   maxMandatoryDaysForWfhSuggestion?: number; // Threshold for suggesting WFH
 }
 
-interface DayRating {
+export interface DayRating {
   score: number;         // 0 to 10
   recommendation: string;
   tag: 'MANDATORY' | 'HIGH_VALUE' | 'WFH_CANDIDATE' | 'SKIP' | 'WORK';

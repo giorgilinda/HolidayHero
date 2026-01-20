@@ -1,0 +1,410 @@
+.summaryContainer {
+    padding: var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--color-background);
+}
+
+.title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--ui-text-default);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.daysSummaryHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.summaryActions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.selectButton {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    color: var(--ui-text-default);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.selectButton:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.selectButtonActive {
+    background-color: var(--button-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--button-primary);
+}
+
+.actionButton {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    color: var(--ui-text-default);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.actionButton:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.deleteButton {
+    background-color: var(--error-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--error-primary);
+}
+
+.deleteButton:hover {
+    background-color: var(--error-primary-dark);
+}
+
+.selectedCount {
+    font-size: var(--font-size-sm);
+    color: var(--ui-text-secondary);
+    padding: 0 var(--space-xs);
+}
+
+.section {
+    margin-bottom: var(--space-xl);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--ui-text-default);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--ui-border-default);
+}
+
+/* Person Statistics Table */
+.statsTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-background);
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.statsTable thead {
+    background-color: var(--ui-background-light);
+}
+
+.statsTable th {
+    padding: var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--ui-text-default);
+    border-bottom: 2px solid var(--ui-border-default);
+    font-size: var(--font-size-sm);
+}
+
+.statsTable td {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--ui-border-light);
+    font-size: var(--font-size-base);
+}
+
+.statsTable tbody tr:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.statsTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.personName {
+    font-weight: 600;
+    color: var(--ui-text-default);
+}
+
+.statCell {
+    text-align: center;
+    color: var(--ui-text-secondary);
+}
+
+.totalCell {
+    text-align: center;
+    font-weight: 600;
+    color: var(--ui-text-default);
+    background-color: var(--ui-background-light);
+}
+
+/* Days Summary Table */
+.daysTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-background);
+    border: 1px solid var(--ui-border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.daysTable thead {
+    background-color: var(--ui-background-light);
+}
+
+.daysTable th {
+    padding: var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--ui-text-default);
+    border-bottom: 2px solid var(--ui-border-default);
+    font-size: var(--font-size-sm);
+}
+
+.daysTable td {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--ui-border-light);
+    font-size: var(--font-size-base);
+}
+
+.daysTable tbody tr:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.daysTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.daysTable tbody tr {
+    cursor: pointer;
+    transition: background-color var(--transition-base);
+}
+
+.daysTable tbody tr:hover {
+    background-color: var(--ui-background-hover);
+}
+
+.selectedRow {
+    background-color: var(--ui-background-selected) !important;
+}
+
+.checkboxHeader {
+    width: 40px;
+    text-align: center;
+}
+
+.checkboxCell {
+    width: 40px;
+    text-align: center;
+    padding: var(--space-md) !important;
+    cursor: pointer;
+}
+
+.checkbox {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--ui-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    text-align: center;
+    line-height: 16px;
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-base);
+}
+
+.checkboxChecked {
+    background-color: var(--button-primary);
+    border-color: var(--button-primary);
+    color: var(--color-text-inverse);
+}
+
+.dateCell {
+    font-weight: 500;
+    color: var(--ui-text-default);
+    white-space: nowrap;
+}
+
+.typeCell {
+    width: 120px;
+}
+
+.typeBadge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.mandatoryRow .typeBadge {
+    background-color: var(--calendar-mandatory);
+    color: var(--color-text-primary);
+}
+
+.wfhRow .typeBadge {
+    background-color: var(--calendar-work-from-home);
+    color: var(--color-text-primary);
+}
+
+.bridgeRow .typeBadge {
+    background-color: var(--calendar-high-value);
+    color: var(--color-text-primary);
+}
+
+.vacationRow .typeBadge {
+    background-color: var(--calendar-manual-override);
+    color: var(--color-text-primary);
+}
+
+.activityRow .typeBadge {
+    background-color: var(--calendar-manual-override-activity);
+    color: var(--calendar-manual-override-activity-text);
+}
+
+.overrideRow .typeBadge {
+    background-color: var(--ui-background-light);
+    color: var(--ui-text-default);
+    border: 1px solid var(--ui-border-default);
+}
+
+.overridePeople {
+    color: var(--ui-text-secondary);
+    font-weight: 500;
+    font-size: var(--font-size-xs);
+    margin-left: var(--space-xs);
+}
+
+.noteCell {
+    color: var(--ui-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.wfhPeople {
+    color: var(--calendar-today-border);
+    font-weight: 500;
+    font-size: var(--font-size-xs);
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--ui-text-secondary);
+    font-size: var(--font-size-lg);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .summaryContainer {
+        padding: var(--space-md);
+    }
+
+    .title {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--space-lg);
+    }
+
+    .sectionTitle {
+        font-size: var(--font-size-lg);
+    }
+
+    .statsTable,
+    .daysTable {
+        font-size: var(--font-size-sm);
+    }
+
+    .statsTable th,
+    .statsTable td,
+    .daysTable th,
+    .daysTable td {
+        padding: var(--space-sm);
+    }
+
+    .typeCell {
+        width: 100px;
+    }
+
+    .typeBadge {
+        font-size: var(--font-size-xxs);
+        padding: var(--space-xxs) var(--space-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .summaryContainer {
+        padding: var(--space-sm);
+    }
+
+    .title {
+        font-size: var(--font-size-lg);
+    }
+
+    .statsTable,
+    .daysTable {
+        font-size: var(--font-size-xs);
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .statsTable thead,
+    .statsTable tbody,
+    .statsTable tr,
+    .daysTable thead,
+    .daysTable tbody,
+    .daysTable tr {
+        display: block;
+    }
+
+    .statsTable thead,
+    .daysTable thead {
+        display: none;
+    }
+
+    .statsTable tr,
+    .daysTable tr {
+        border: 1px solid var(--ui-border-default);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-xs);
+        padding: var(--space-xs);
+        background-color: var(--ui-background-light);
+    }
+
+    .statsTable td,
+    .daysTable td {
+        display: block;
+        text-align: right;
+        padding: var(--space-xs);
+        border-bottom: 1px solid var(--ui-border-light);
+    }
+
+    .statsTable td:before,
+    .daysTable td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: var(--ui-text-secondary);
+    }
+
+    .dateCell,
+    .personName {
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+    }
+
+    .typeCell {
+        width: auto;
+    }
+}
+

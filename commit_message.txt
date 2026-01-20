@@ -1,0 +1,35 @@
+feat: add vacation summary view with smart filtering
+
+Major features and improvements:
+
+Summary View:
+- Added new "Summary" view mode accessible from calendar header
+- Displays comprehensive vacation statistics for the entire year
+- Person Statistics table showing vacation/WFH/activity days per person with totals
+- Days Summary table listing all important days (mandatory, WFH, bridge)
+- Smart filtering for mandatory days: only shows days requiring care
+  * Hides days where all kids have activities (no care needed)
+  * Hides days where adults are on vacation (help available)
+- Selection mode for bulk editing days directly from summary
+- Click on days to navigate to monthly view (when not in selection mode)
+- Click on checkbox or row to select days (when in selection mode)
+- Year navigation with arrow buttons and "Today" button
+
+Navigation & UX:
+- Summary view shows year navigation (arrows and Today button)
+- Select button moved to Days Summary section header
+- Edit/Delete buttons appear when days are selected
+- Clicking days in summary navigates to monthly view for that day
+- Selection mode works with checkboxes and row clicks
+
+Technical Implementation:
+- Updated useCalendarData hook to support 'summary' view mode
+- Fetches full year data when in summary view
+- Integrated override logic into mandatory days filtering
+- Removed separate override days category (logic integrated)
+- Added proper TypeScript types and interfaces
+- Responsive design with mobile support
+
+This update provides a comprehensive overview of vacation planning needs
+and makes it easy to identify which days require attention and care.
+

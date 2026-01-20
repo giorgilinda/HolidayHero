@@ -6,7 +6,7 @@ import { DayData, ManualOverride } from '@/components/calendarTypes';
 export const useCalendarData = (
   currentYear: number,
   currentMonth: number,
-  viewMode: 'monthly' | 'yearly',
+  viewMode: 'monthly' | 'yearly' | 'summary',
   manualOverrides: Map<string, ManualOverride>
 ) => {
   const [holidaysData, setHolidaysData] = useState<{
@@ -26,7 +26,7 @@ export const useCalendarData = (
         let validFrom: string;
         let validTo: string;
         
-        if (viewMode === 'yearly') {
+        if (viewMode === 'yearly' || viewMode === 'summary') {
           const firstDay = new Date(currentYear, 0, 1);
           const lastDay = new Date(currentYear, 11, 31);
           validFrom = firstDay.toISOString().split('T')[0];
@@ -66,7 +66,7 @@ export const useCalendarData = (
       let firstDay: Date;
       let lastDay: Date;
       
-      if (viewMode === 'yearly') {
+      if (viewMode === 'yearly' || viewMode === 'summary') {
         firstDay = new Date(currentYear, 0, 1);
         lastDay = new Date(currentYear, 11, 31);
       } else {

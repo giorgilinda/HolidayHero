@@ -5,6 +5,7 @@ import classNames from "classnames";
 import styles from './VacationCalendar.module.css';
 import { MonthlyView } from './MonthlyView';
 import { YearlyView } from './YearlyView';
+import { SummaryView } from './SummaryView';
 import { DayEditDialog, type ManualOverride } from './DayEditDialog';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useManualOverrides } from '@/hooks/useManualOverrides';
@@ -17,7 +18,7 @@ export const VacationCalendar = () => {
 
   const [currentMonth, setCurrentMonth] = useState(initialMonthIndex);
   const [currentYear, setCurrentYear] = useState(initialYearNum);
-  const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('monthly');
+  const [viewMode, setViewMode] = useState<'monthly' | 'yearly' | 'summary'>('monthly');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -90,6 +91,15 @@ export const VacationCalendar = () => {
     setCurrentYear(now.getFullYear());
   };
 
+  const handleNavigateToDay = (date: Date) => {
+    setCurrentMonth(date.getMonth());
+    setCurrentYear(date.getFullYear());
+    setViewMode('monthly');
+    // Optionally, you could also set the selected date to open the dialog
+    // setSelectedDate(date);
+    // setDialogOpen(true);
+  };
+
   const monthString = useMemo(() => {
     const date = new Date(currentYear, currentMonth, 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -100,7 +110,23 @@ export const VacationCalendar = () => {
   }, [currentYear]);
 
   const handleDayClick = (date: Date) => {
-    if (selectionMode) {
+    if (viewMode === 'summary') {
+      // In summary view, always toggle selection
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      setSelectedDates(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(dateStr)) {
+          newSet.delete(dateStr);
+        } else {
+          newSet.add(dateStr);
+        }
+        return newSet;
+      });
+    } else if (selectionMode) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
@@ -183,8 +209,8 @@ export const VacationCalendar = () => {
       <div className={styles.header}>
         <button 
           className={classNames(styles.navButton, styles.arrow)}
-          onClick={viewMode === 'yearly' ? goToPreviousYear : goToPreviousMonth}
-          aria-label={viewMode === 'yearly' ? 'Previous year' : 'Previous month'}
+          onClick={viewMode === 'yearly' || viewMode === 'summary' ? goToPreviousYear : goToPreviousMonth}
+          aria-label={viewMode === 'yearly' || viewMode === 'summary' ? 'Previous year' : 'Previous month'}
           disabled={isLoadingHolidays}
         >
           ‹
@@ -192,52 +218,59 @@ export const VacationCalendar = () => {
         <div className={styles.monthTitleContainer}>
           <button 
             className={styles.navButton}
-            onClick={goToCurrentMonth}
-            aria-label="Go to current month"
+            onClick={viewMode === 'summary' ? () => {
+              const now = new Date();
+              setCurrentYear(now.getFullYear());
+            } : goToCurrentMonth}
+            aria-label={viewMode === 'summary' ? 'Go to current year' : 'Go to current month'}
             disabled={isLoadingHolidays}
-            title="Go to current month"
+            title={viewMode === 'summary' ? 'Go to current year' : 'Go to current month'}
           >
             Today
           </button>
           <h2 className={styles.monthTitle}>
-            {viewMode === 'yearly' ? yearString : monthString}
+            {viewMode === 'yearly' || viewMode === 'summary' ? yearString : monthString}
             {isLoadingHolidays && <span style={{ fontSize: '0.6em', marginLeft: '8px' }}>Loading...</span>}
           </h2>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            className={classNames(styles.navButton, selectionMode && styles.activeViewButton)}
-            onClick={handleToggleSelectionMode}
-            aria-label="Toggle selection mode"
-            disabled={isLoadingHolidays}
-            title="Toggle selection mode"
-          >
-            {selectionMode ? '✓ Select' : 'Select'}
-          </button>
-          {selectionMode && selectedDates.size > 0 && (
+          {viewMode !== 'summary' && (
             <>
-              <span style={{ fontSize: '0.9em', color: 'var(--ui-text-secondary)' }}>
-                {selectedDates.size} selected
-              </span>
               <button
-                className={classNames(styles.navButton)}
-                onClick={handleOpenBulkDialog}
-                aria-label="Edit selected days"
+                className={classNames(styles.navButton, selectionMode && styles.activeViewButton)}
+                onClick={handleToggleSelectionMode}
+                aria-label="Toggle selection mode"
                 disabled={isLoadingHolidays}
-                title="Edit selected days"
+                title="Toggle selection mode"
               >
-                Edit
+                {selectionMode ? '✓ Select' : 'Select'}
               </button>
-              <button
-                className={classNames(styles.navButton)}
-                onClick={handleBulkDelete}
-                aria-label="Delete selected days"
-                disabled={isLoadingHolidays}
-                title="Delete selected days"
-                style={{ backgroundColor: 'var(--error-primary)', color: 'var(--color-text-inverse)' }}
-              >
-                Delete
-              </button>
+              {selectionMode && selectedDates.size > 0 && (
+                <>
+                  <span style={{ fontSize: '0.9em', color: 'var(--ui-text-secondary)' }}>
+                    {selectedDates.size} selected
+                  </span>
+                  <button
+                    className={classNames(styles.navButton)}
+                    onClick={handleOpenBulkDialog}
+                    aria-label="Edit selected days"
+                    disabled={isLoadingHolidays}
+                    title="Edit selected days"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={classNames(styles.navButton)}
+                    onClick={handleBulkDelete}
+                    aria-label="Delete selected days"
+                    disabled={isLoadingHolidays}
+                    title="Delete selected days"
+                    style={{ backgroundColor: 'var(--error-primary)', color: 'var(--color-text-inverse)' }}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </>
           )}
           <button
@@ -258,11 +291,20 @@ export const VacationCalendar = () => {
           >
             Year
           </button>
+          <button
+            className={classNames(styles.navButton, viewMode === 'summary' && styles.activeViewButton)}
+            onClick={() => setViewMode('summary')}
+            aria-label="Summary view"
+            disabled={isLoadingHolidays}
+            title="Summary view"
+          >
+            Summary
+          </button>
         </div>
         <button 
           className={classNames(styles.navButton, styles.arrow)}
-          onClick={viewMode === 'yearly' ? goToNextYear : goToNextMonth}
-          aria-label={viewMode === 'yearly' ? 'Next year' : 'Next month'}
+          onClick={viewMode === 'yearly' || viewMode === 'summary' ? goToNextYear : goToNextMonth}
+          aria-label={viewMode === 'yearly' || viewMode === 'summary' ? 'Next year' : 'Next month'}
           disabled={isLoadingHolidays}
         >
           ›
@@ -289,7 +331,7 @@ export const VacationCalendar = () => {
           selectedDates={selectedDates}
           selectionMode={selectionMode}
         />
-      ) : (
+      ) : viewMode === 'yearly' ? (
         <YearlyView
           currentYear={currentYear}
           currentMonth={0}
@@ -298,6 +340,20 @@ export const VacationCalendar = () => {
           onDayClick={handleDayClick}
           selectedDates={selectedDates}
           selectionMode={selectionMode}
+        />
+      ) : (
+        <SummaryView
+          currentYear={currentYear}
+          dayDataMap={finalDayDataMap}
+          people={people}
+          manualOverrides={manualOverrides}
+          selectedDates={selectedDates}
+          selectionMode={selectionMode}
+          onDaySelect={handleDayClick}
+          onToggleSelectionMode={handleToggleSelectionMode}
+          onBulkEdit={handleOpenBulkDialog}
+          onBulkDelete={handleBulkDelete}
+          onNavigateToDay={handleNavigateToDay}
         />
       )}
       <DayEditDialog
