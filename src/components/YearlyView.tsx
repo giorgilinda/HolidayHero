@@ -12,6 +12,7 @@ const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
 
 export const YearlyView: React.FC<CalendarViewProps> = ({
   currentYear,
+  currentMonth,
   dayDataMap,
   people,
   onDayClick,

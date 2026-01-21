@@ -8,6 +8,8 @@ export interface Person {
   id: string;
   name: string;
   isChild?: boolean;
+  availability?: boolean;
+  wfhAbility?: boolean;
 }
 
 export interface ManualOverride {

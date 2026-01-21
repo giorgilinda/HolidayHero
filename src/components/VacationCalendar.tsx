@@ -334,7 +334,7 @@ export const VacationCalendar = () => {
         </div>
         {user && (
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.9em', color: THEME_COLORS.textSecondary }}>
+            <span style={{ fontSize: '0.9em', color: THEME_COLORS.uiTextSecondary }}>
               {user.email}
             </span>
             <button

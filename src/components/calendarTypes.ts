@@ -33,6 +33,6 @@ export interface CalendarViewProps {
   onDayClick: (date: Date) => void;
   selectedDates?: Set<string>;
   selectionMode?: boolean;
-  familyId?: string;
+  familyId?: string; // Optional family ID for multi-family support
 }
 

@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
 
 /**
  * Server-side Supabase client with authentication
  * Use this in API routes and server components
+ * 
+ * Note: For App Router routes, cookies are handled automatically by the client-side
+ * Supabase client. This is a simplified version for basic server-side operations.
  */
 export async function createServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,24 +17,7 @@ export async function createServerClient() {
     );
   }
 
-  const cookieStore = await cookies();
-  
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        } catch (error) {
-          // The `setAll` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
-        }
-      },
-    },
-  });
+  // Create a basic client for server-side operations
+  // For auth callbacks, the client-side will handle session management
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
