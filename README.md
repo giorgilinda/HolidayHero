@@ -43,11 +43,19 @@ school closures, and WFH flexibility to find the best days for PTO.
 - **Easy Customization**: Change the entire app's appearance by editing CSS variables
 - **TypeScript Constants**: Theme values available in TSX files via constants
 
+### 🔐 Authentication & Multi-Family Support
+- **Google OAuth**: Sign in with your Google account
+- **Email/Password**: Traditional email and password authentication
+- **Multi-Family Support**: Each family has isolated data
+- **Row Level Security**: Database-level security ensures data privacy
+- **Automatic Family Creation**: New users automatically get their own family
+
 ## 🛠️ Technical Stack
 
 - **Next.js 15** - Latest version with App Router
 - **TypeScript** - Type-safe development
 - **React 19** - Latest React features
+- **Supabase** - Database and authentication
 - **CSS Modules** - Scoped component styling
 - **Custom Hooks** - Reusable logic (`useCalendarData`, `useManualOverrides`)
 - **API Routes** - Server-side endpoints for holidays and overrides
@@ -85,10 +93,11 @@ src/
 │   ├── constants.ts         # App constants
 │   └── themeConstants.ts   # Theme constants for TSX
 ├── config/                 # Configuration files
-│   ├── people.json         # People and preferences
-│   └── userPreferences.ts  # Preferences loader
-├── data/                   # Data files
-│   └── manualOverrides.json # Stored overrides
+│   └── people.json         # People and preferences (used for initial migration only)
+├── lib/                    # Library utilities
+│   └── supabase.ts         # Supabase client configuration
+├── supabase/               # Database migrations
+│   └── migrations/         # SQL migration files
 └── styles/                 # Global styles
     └── theme.css           # Theme variables
 ```
@@ -187,29 +196,17 @@ Modal dialog for editing day overrides:
 
 ### People & Preferences
 
-Configure your family and preferences in `src/config/people.json`:
+People and preferences are now stored in Supabase. After running the database migrations, use the migration endpoint to seed initial data:
 
-```json
-{
-  "people": [
-    {
-      "id": "mom",
-      "name": "Linda",
-      "isChild": false,
-      "availability": true,
-      "wfhAbility": true
-    },
-    {
-      "id": "leon",
-      "name": "Leon",
-      "isChild": true
-    }
-  ],
-  "preferences": {
-    "maxMandatoryDaysForWfhSuggestion": 2
-  }
-}
+```bash
+curl -X POST http://localhost:3000/api/people/migrate
 ```
+
+This will copy data from `src/config/people.json` into your database. After migration, all people and preferences are managed through the database.
+
+To update people or preferences, use the `/api/people` endpoint or update directly in Supabase.
+
+See `MIGRATION_GUIDE.md` for detailed migration instructions.
 
 ### Holiday API Configuration
 
@@ -220,7 +217,7 @@ Configure holiday API settings in `src/utils/constants.ts`:
 
 ### Manual Overrides
 
-Overrides are stored in `src/data/manualOverrides.json` and managed via the API at `/api/overrides`.
+Overrides are stored in Supabase and managed via the API at `/api/overrides`. See `SUPABASE_SETUP.md` for database setup instructions.
 
 ## 🔧 Configuration
 
@@ -240,9 +237,19 @@ Jest is configured to work with TypeScript and React Testing Library. Configurat
 
 ### Vercel (Recommended)
 
+See `DEPLOYMENT.md` for a complete step-by-step deployment guide.
+
+**Quick Start:**
 1. Push your code to GitHub
 2. Import your repository on [Vercel](https://vercel.com)
-3. Deploy!
+3. Set environment variables (Supabase URL and keys)
+4. Deploy!
+
+**Important:** Make sure to:
+- Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
+- Update Google OAuth redirect URI for production (if using)
+- Run all database migrations in Supabase
+- Update Supabase Site URL to your Vercel deployment URL
 
 ### Other Platforms
 
@@ -252,6 +259,8 @@ The project can be deployed to any platform that supports Next.js:
 - AWS Amplify
 - Cloudflare Pages
 - Self-hosted (Node.js)
+
+See `DEPLOYMENT.md` for detailed deployment instructions.
 
 ## 📦 Features Summary
 

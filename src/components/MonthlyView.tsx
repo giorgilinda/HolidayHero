@@ -5,7 +5,7 @@ import styles from './MonthlyView.module.css';
 import { DayCell } from './DayCell';
 import { CalendarViewProps, CalendarDay, PersonConfig } from './calendarTypes';
 import { calculateDayRating, DayContext } from '@/utils/brain';
-import { userPreferences } from '@/config/userPreferences';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export const MonthlyView: React.FC<CalendarViewProps> = ({
   currentYear,
@@ -15,10 +15,12 @@ export const MonthlyView: React.FC<CalendarViewProps> = ({
   onDayClick,
   selectedDates = new Set(),
   selectionMode = false,
+  familyId,
 }) => {
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const monthIndex = currentMonth;
   const yearNum = currentYear;
+  const userPreferences = useUserPreferences(familyId);
 
   // Generate all days of the month
   const calendarDays = useMemo(() => {
@@ -123,7 +125,7 @@ export const MonthlyView: React.FC<CalendarViewProps> = ({
     }
     
     return days;
-  }, [yearNum, monthIndex, dayDataMap, people]);
+  }, [yearNum, monthIndex, dayDataMap, people, userPreferences]);
 
   return (
     <div className={styles.calendar}>

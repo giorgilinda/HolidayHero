@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { retryFetch } from "@/utils/retryFetch";
 
 const API_BASE_URL = 'https://openholidaysapi.org';
 
@@ -37,20 +38,26 @@ export default async function handler(
       url.searchParams.set('subdivisionCode', subdivisionCode as string);
     }
 
-    const response = await fetch(url.toString(), {
+    const response = await retryFetch(url.toString(), {
       headers: {
         'accept': 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error(`OpenHolidays API error: ${response.status} ${response.statusText}`);
+      // Return 503 for temporary errors, 500 for permanent ones
+      const statusCode = response.status === 503 || response.status === 502 || response.status === 429 
+        ? 503 
+        : 500;
+      const errorMessage = `OpenHolidays API error: ${response.status} ${response.statusText}`;
+      return res.status(statusCode).json({ error: errorMessage });
     }
 
     const data = await response.json();
     res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching public holidays:', error);
+    // Network errors or other issues
     res.status(500).json({ 
       error: error instanceof Error ? error.message : 'Failed to fetch public holidays' 
     });

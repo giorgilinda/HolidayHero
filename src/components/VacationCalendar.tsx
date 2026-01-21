@@ -10,6 +10,8 @@ import { DayEditDialog, type ManualOverride } from './DayEditDialog';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useManualOverrides } from '@/hooks/useManualOverrides';
 import { THEME_COLORS, THEME_SPACING } from '@/utils/themeConstants';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export const VacationCalendar = () => {
   const now = new Date();
@@ -34,6 +36,27 @@ export const VacationCalendar = () => {
     tempOverrides
   );
 
+  // Get authenticated user's family
+  const { getFamilyId, user, signOut } = useAuth();
+  const router = useRouter();
+  const [familyId, setFamilyId] = useState<string | undefined>(undefined);
+
+  // Load family ID from auth
+  useEffect(() => {
+    const loadFamilyId = async () => {
+      if (user) {
+        const id = await getFamilyId();
+        setFamilyId(id || undefined);
+      }
+    };
+    loadFamilyId();
+  }, [user, getFamilyId]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/auth/login');
+  };
+
   // Get manual overrides management
   const {
     manualOverrides,
@@ -41,7 +64,7 @@ export const VacationCalendar = () => {
     handleSaveOverride,
     handleDeleteOverride,
     setHolidaysDataForOverrides,
-  } = useManualOverrides(holidaysData);
+  } = useManualOverrides(holidaysData, familyId);
 
   // Update holidaysData in useManualOverrides when it's fetched
   useEffect(() => {
@@ -300,15 +323,31 @@ export const VacationCalendar = () => {
             Summary
           </button>
         </div>
-        <button 
-          className={classNames(styles.navButton, styles.arrow)}
-          onClick={viewMode === 'yearly' || viewMode === 'summary' ? goToNextYear : goToNextMonth}
-          aria-label={viewMode === 'yearly' || viewMode === 'summary' ? 'Next year' : 'Next month'}
-          disabled={isLoadingHolidays}
-        >
-          ›
-        </button>
-      </div>
+          <button 
+            className={classNames(styles.navButton, styles.arrow)}
+            onClick={viewMode === 'yearly' || viewMode === 'summary' ? goToNextYear : goToNextMonth}
+            aria-label={viewMode === 'yearly' || viewMode === 'summary' ? 'Next year' : 'Next month'}
+            disabled={isLoadingHolidays}
+          >
+            ›
+          </button>
+        </div>
+        {user && (
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.9em', color: THEME_COLORS.textSecondary }}>
+              {user.email}
+            </span>
+            <button
+              onClick={handleSignOut}
+              className={styles.navButton}
+              aria-label="Sign out"
+              title="Sign out"
+              style={{ fontSize: '0.85em', padding: '4px 8px' }}
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
       {holidaysError && (
         <div style={{ 
           padding: THEME_SPACING.sm, 
@@ -329,6 +368,7 @@ export const VacationCalendar = () => {
           onDayClick={handleDayClick}
           selectedDates={selectedDates}
           selectionMode={selectionMode}
+          familyId={familyId}
         />
       ) : viewMode === 'yearly' ? (
         <YearlyView
@@ -339,6 +379,7 @@ export const VacationCalendar = () => {
           onDayClick={handleDayClick}
           selectedDates={selectedDates}
           selectionMode={selectionMode}
+          familyId={familyId}
         />
       ) : (
         <SummaryView
@@ -353,6 +394,7 @@ export const VacationCalendar = () => {
           onBulkEdit={handleOpenBulkDialog}
           onBulkDelete={handleBulkDelete}
           onNavigateToDay={handleNavigateToDay}
+          familyId={familyId}
         />
       )}
       <DayEditDialog

@@ -5,7 +5,7 @@ import styles from './SummaryView.module.css';
 import { Person } from './DayEditDialog';
 import { DayData, ManualOverride, PersonConfig } from './calendarTypes';
 import { calculateDayRating, DayContext, DayRating } from '@/utils/brain';
-import { userPreferences } from '@/config/userPreferences';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface SummaryViewProps {
   currentYear: number;
@@ -19,6 +19,7 @@ interface SummaryViewProps {
   onBulkEdit: () => void;
   onBulkDelete: () => void;
   onNavigateToDay: (date: Date) => void;
+  familyId?: string;
 }
 
 type DayType = 'vacation' | 'wfh' | 'bridge' | 'mandatory' | 'activity' | 'with-issue';
@@ -48,6 +49,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
   people,
   manualOverrides,
   selectedDates,
+  familyId,
   selectionMode,
   onDaySelect,
   onToggleSelectionMode,
@@ -55,6 +57,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
   onBulkDelete,
   onNavigateToDay,
 }) => {
+  const userPreferences = useUserPreferences(familyId);
   const [activeFilter, setActiveFilter] = useState<FilterType>('need-attention');
   const summaryData = useMemo(() => {
     const allDays: DaySummary[] = [];
@@ -295,7 +298,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
       allDays: Array.from(uniqueDays.values()).sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime()),
       personStats: personStats.filter(p => p.vacationDays > 0 || p.wfhDays > 0 || p.activityDays > 0),
     };
-  }, [currentYear, dayDataMap, people, manualOverrides]);
+  }, [currentYear, dayDataMap, people, manualOverrides, userPreferences]);
 
   // Filter days based on active filter
   const filteredDays = useMemo(() => {

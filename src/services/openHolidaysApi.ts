@@ -57,7 +57,15 @@ export async function fetchPublicHolidays(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to fetch public holidays: ${response.status} ${errorData.error || response.statusText}`);
+      const status = response.status;
+      const errorMessage = errorData.error || response.statusText;
+      
+      // Provide user-friendly messages for common errors
+      if (status === 503 || status === 502 || status === 429) {
+        throw new Error(`The holiday service is temporarily unavailable. Please try again in a moment. (${status} ${errorMessage})`);
+      }
+      
+      throw new Error(`Failed to fetch public holidays: ${status} ${errorMessage}`);
     }
 
     const data = await response.json();
@@ -109,7 +117,15 @@ export async function fetchSchoolHolidays(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: response.statusText }));
-      throw new Error(`Failed to fetch school holidays: ${response.status} ${errorData.error || response.statusText}`);
+      const status = response.status;
+      const errorMessage = errorData.error || response.statusText;
+      
+      // Provide user-friendly messages for common errors
+      if (status === 503 || status === 502 || status === 429) {
+        throw new Error(`The holiday service is temporarily unavailable. Please try again in a moment. (${status} ${errorMessage})`);
+      }
+      
+      throw new Error(`Failed to fetch school holidays: ${status} ${errorMessage}`);
     }
 
     const data = await response.json();

@@ -25,31 +25,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📋 Initial Setup
 
-### 1. Configure Your Family
+### 1. Set Up Database and Configure Your Family
 
-Edit `src/config/people.json` to add your family members:
+1. **Set up Supabase** (see `SUPABASE_SETUP.md` for details):
+   - Create a Supabase project
+   - Run the database migrations
+   - Configure environment variables
 
-```json
-{
-  "people": [
-    {
-      "id": "mom",
-      "name": "Your Name",
-      "isChild": false,
-      "availability": true,
-      "wfhAbility": true
-    },
-    {
-      "id": "child1",
-      "name": "Child Name",
-      "isChild": true
-    }
-  ],
-  "preferences": {
-    "maxMandatoryDaysForWfhSuggestion": 2
-  }
-}
-```
+2. **Migrate your family data**:
+   - Edit `src/config/people.json` with your family members (if needed)
+   - Run the migration: `curl -X POST http://localhost:3000/api/people/migrate`
+   - Or use the Supabase dashboard to add people directly
+
+After migration, people and preferences are stored in Supabase and can be managed through the API or Supabase dashboard.
 
 ### 2. Configure Holiday API
 
@@ -85,7 +73,8 @@ npm start
 
 ## 📚 Next Steps
 
-- [ ] Configure your family in `src/config/people.json`
+- [ ] Set up Supabase and run database migrations
+- [ ] Migrate your family data to the database
 - [ ] Set up holiday API location in `src/utils/constants.ts`
 - [ ] Customize theme colors in `src/styles/theme.css` (optional)
 - [ ] Start planning your vacations! 🏖️

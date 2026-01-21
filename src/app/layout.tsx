@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import BaseLayout from "./templates/BaseTemplate";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { APP_NAME, APP_DESCRIPTION, APP_EMOJI } from "../utils/constants";
 
 export const metadata: Metadata = {
@@ -35,7 +36,9 @@ export default function RootLayout({
         ></link>
       </head>
       <body>
-        <BaseLayout>{children}</BaseLayout>
+        <AuthProvider>
+          <BaseLayout>{children}</BaseLayout>
+        </AuthProvider>
       </body>
     </html>
   );

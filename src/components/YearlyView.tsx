@@ -5,7 +5,7 @@ import styles from './YearlyView.module.css';
 import { DayCell } from './DayCell';
 import { CalendarViewProps, CalendarDay, PersonConfig } from './calendarTypes';
 import { calculateDayRating, DayContext } from '@/utils/brain';
-import { userPreferences } from '@/config/userPreferences';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                     'July', 'August', 'September', 'October', 'November', 'December'];
@@ -17,7 +17,9 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
   onDayClick,
   selectedDates = new Set(),
   selectionMode = false,
+  familyId,
 }) => {
+  const userPreferences = useUserPreferences(familyId);
 
   const yearlyCalendarData = useMemo(() => {
     const months: Array<{
@@ -155,7 +157,7 @@ export const YearlyView: React.FC<CalendarViewProps> = ({
     }
     
     return months;
-  }, [dayDataMap, currentYear, people]);
+  }, [dayDataMap, currentYear, people, userPreferences]);
 
   // Debug: Log to verify all months are generated
   if (process.env.NODE_ENV === 'development') {
