@@ -110,7 +110,7 @@ export function LoginForm() {
         </button>
 
         <p className={styles.footer}>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <a href="/auth/signup" className={styles.link}>
             Sign up
           </a>

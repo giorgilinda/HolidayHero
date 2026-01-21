@@ -62,7 +62,7 @@ export function SignupForm() {
         <div className={styles.authCard}>
           <h2>Check your email</h2>
           <p className={styles.success}>
-            We've sent you a confirmation email. Please check your inbox and click the link to verify your account.
+            We&apos;ve sent you a confirmation email. Please check your inbox and click the link to verify your account.
           </p>
         </div>
       </div>

@@ -144,7 +144,7 @@ export const useManualOverrides = (initialHolidaysData: HolidaysData | null, fam
 
       return hasChanges ? newOverrides : prev;
     });
-  }, [holidaysData, isOverridesLoaded, people, deletedDates]);
+  }, [holidaysData, isOverridesLoaded, people, deletedDates, isLoadingPeople]);
 
   // Save manual overrides to database whenever they change (but not on initial load)
   useEffect(() => {
