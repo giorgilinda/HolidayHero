@@ -1,19 +1,73 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Auth.module.css';
+
+interface Family {
+  id: string;
+  name: string;
+}
 
 export function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [familyMode, setFamilyMode] = useState<'create' | 'join'>('create');
+  const [familyName, setFamilyName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [searchResults, setSearchResults] = useState<Family[]>([]);
+  const [selectedFamilyId, setSelectedFamilyId] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { signUp, signInWithGoogle } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check for invite code in URL and pre-fill it
+  useEffect(() => {
+    const inviteParam = searchParams?.get('invite');
+    if (inviteParam) {
+      const cleanInviteCode = inviteParam.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8);
+      if (cleanInviteCode.length >= 4) {
+        setInviteCode(cleanInviteCode);
+        setFamilyMode('join');
+      }
+    }
+  }, [searchParams]);
+
+  // Search for families by invite code
+  useEffect(() => {
+    if (familyMode === 'join' && inviteCode.trim().length >= 4) {
+      const searchTimeout = setTimeout(async () => {
+        setSearching(true);
+        try {
+          const response = await fetch(`/api/families?inviteCode=${encodeURIComponent(inviteCode.trim())}`);
+          if (response.ok) {
+            const families = await response.json();
+            setSearchResults(families);
+            if (families.length > 0) {
+              setSelectedFamilyId(families[0].id);
+            } else {
+              setSelectedFamilyId(null);
+            }
+          }
+        } catch (err) {
+          console.error('Error searching family by invite code:', err);
+        } finally {
+          setSearching(false);
+        }
+      }, 300); // Debounce search
+
+      return () => clearTimeout(searchTimeout);
+    } else {
+      setSearchResults([]);
+      setSelectedFamilyId(null);
+    }
+  }, [inviteCode, familyMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +83,71 @@ export function SignupForm() {
       return;
     }
 
+    // Validate family selection
+    if (familyMode === 'create' && !familyName.trim()) {
+      setError('Please enter a family name');
+      return;
+    }
+
+    if (familyMode === 'join' && !selectedFamilyId && !inviteCode.trim()) {
+      setError('Please enter an invite code to join a family');
+      return;
+    }
+    
+    if (familyMode === 'join' && inviteCode.trim() && !selectedFamilyId) {
+      setError('Invalid invite code. Please check and try again.');
+      return;
+    }
+
+    // Check if family name already exists (for create mode)
+    if (familyMode === 'create' && familyName.trim()) {
+      setLoading(true);
+      try {
+        // Use exact=true to check for duplicate names (bypasses public-only restriction)
+        const response = await fetch(`/api/families?search=${encodeURIComponent(familyName.trim())}&exact=true`);
+        if (response.ok) {
+          const existingFamilies = await response.json();
+          // If any family is returned, it means a duplicate exists
+          if (existingFamilies && existingFamilies.length > 0) {
+            setError(`A family with the name "${familyName.trim()}" already exists. Please ask the family owner for the invite code to join instead.`);
+            setLoading(false);
+            return;
+          }
+        } else {
+          // If the API call failed, log it
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.warn('Failed to check for duplicate family name:', response.status, errorText);
+          // Don't block signup - the database constraint will prevent duplicates anyway
+        }
+      } catch (err) {
+        console.error('Error checking family name:', err);
+        // Continue with signup if check fails (don't block user)
+        // The database constraint will prevent duplicates anyway
+      }
+      setLoading(false);
+    }
+
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error, session } = await signUp(
+      email, 
+      password, 
+      familyMode === 'create' ? familyName.trim() : undefined,
+      familyMode === 'join' ? selectedFamilyId || undefined : undefined
+    );
     
     if (error) {
-      setError(error.message);
+      // Display the error message to the user
+      const errorMessage = error.message || 'An error occurred during signup';
+      setError(errorMessage);
       setLoading(false);
+      return;
+    } else if (session) {
+      // User is immediately authenticated (email confirmations disabled)
+      // Redirect to home page
+      router.push('/');
     } else {
+      // Email confirmation required
       setSuccess(true);
       // Wait a bit then redirect to login or show message
       setTimeout(() => {
@@ -50,8 +161,12 @@ export function SignupForm() {
     setLoading(true);
     try {
       await signInWithGoogle();
-    } catch (err) {
-      setError('Failed to sign in with Google');
+      // If successful, the page will redirect to Google OAuth
+      // Don't reset loading here - let the redirect happen
+      // If there's an error, it will be caught below
+    } catch (err: any) {
+      console.error('Google sign-in error:', err);
+      setError(err?.message || 'Failed to sign in with Google. Please check your browser console for details.');
       setLoading(false);
     }
   };
@@ -117,6 +232,77 @@ export function SignupForm() {
               disabled={loading}
               placeholder="••••••••"
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Family</label>
+            <div className={styles.toggleButtonGroup}>
+              <button
+                type="button"
+                onClick={() => {
+                  setFamilyMode('create');
+                  setInviteCode('');
+                  setSelectedFamilyId(null);
+                }}
+                className={`${styles.toggleButton} ${familyMode === 'create' ? styles.toggleButtonActive : ''}`}
+              >
+                Create New
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFamilyMode('join');
+                  setFamilyName('');
+                  setInviteCode('');
+                }}
+                className={`${styles.toggleButton} ${familyMode === 'join' ? styles.toggleButtonActive : ''}`}
+              >
+                Join Existing
+              </button>
+            </div>
+
+            {familyMode === 'create' ? (
+              <input
+                type="text"
+                value={familyName}
+                onChange={(e) => setFamilyName(e.target.value)}
+                disabled={loading}
+                placeholder="Enter family name"
+                required
+              />
+            ) : (
+              <div>
+                <input
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => {
+                    setInviteCode(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''));
+                  }}
+                  disabled={loading}
+                  placeholder="Enter family invite code (e.g., abc12345)"
+                  className={styles.searchInputWrapper}
+                  maxLength={8}
+                  style={{ textTransform: 'lowercase', fontFamily: 'monospace', letterSpacing: '0.1em' }}
+                />
+                {searching && <small>Searching...</small>}
+                {!searching && inviteCode.trim().length >= 4 && searchResults.length > 0 && (
+                  <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'var(--success-background)', borderRadius: '4px', color: 'var(--success-text)' }}>
+                    ✓ Found family: <strong>{searchResults[0].name}</strong>
+                  </div>
+                )}
+                {!searching && inviteCode.trim().length >= 4 && searchResults.length === 0 && (
+                  <small className={styles.searchMessage}>No family found with this invite code</small>
+                )}
+                {inviteCode.trim().length > 0 && inviteCode.trim().length < 4 && (
+                  <small className={styles.searchMessage}>Enter at least 4 characters</small>
+                )}
+                {inviteCode.trim().length === 0 && (
+                  <small className={styles.searchMessage} style={{ marginTop: '0.5rem', display: 'block' }}>
+                    Ask the family owner for the invite code to join their family
+                  </small>
+                )}
+              </div>
+            )}
           </div>
 
           <button

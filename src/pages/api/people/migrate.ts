@@ -12,7 +12,7 @@ import peopleConfig from '@/config/people.json';
  * This should only be run once after setting up the database.
  * 
  * Usage: POST /api/people/migrate?family_id=<family-id>
- * Or: POST /api/people/migrate (uses default family)
+ * family_id is required - users must have a real family
  */
 export default async function handler(
   req: NextApiRequest,
@@ -29,31 +29,25 @@ export default async function handler(
   }
 
   try {
-    // Get or create default family
-    let familyId = req.query.family_id as string;
+    // family_id is required - no default family fallback
+    const familyId = req.query.family_id as string;
     if (!familyId) {
-      const defaultFamilyName = process.env.DEFAULT_FAMILY_NAME || 'default';
-      
-      const { data: existingFamily } = await supabase
-        .from('families')
-        .select('id')
-        .eq('name', defaultFamilyName)
-        .maybeSingle();
-      
-      if (existingFamily) {
-        familyId = existingFamily.id;
-      } else {
-        const { data: newFamily, error } = await supabase
-          .from('families')
-          .insert({ name: defaultFamilyName })
-          .select('id')
-          .single();
-        
-        if (error || !newFamily) {
-          throw new Error(`Failed to create default family: ${error?.message || 'Unknown error'}`);
-        }
-        familyId = newFamily.id;
-      }
+      return res.status(400).json({ 
+        error: 'family_id query parameter is required. Usage: POST /api/people/migrate?family_id=<family-id>' 
+      });
+    }
+
+    // Verify the family exists
+    const { data: family, error: familyError } = await supabase
+      .from('families')
+      .select('id, name')
+      .eq('id', familyId)
+      .maybeSingle();
+    
+    if (familyError || !family) {
+      return res.status(404).json({ 
+        error: `Family with ID ${familyId} not found` 
+      });
     }
 
     // Transform people.json data to database format

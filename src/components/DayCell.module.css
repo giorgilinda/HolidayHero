@@ -57,17 +57,18 @@
 }
 
 .weekend {
-    background-color: var(--calendar-weekend, #f5f7fa) !important;
+    background-color: var(--calendar-weekend) !important;
 }
 
 .weekend.otherMonth {
-    background-color: var(--calendar-weekend-other-month, #f0f2f5) !important;
+    background-color: var(--calendar-weekend-other-month) !important;
 }
 
 
 .invalidDay {
     background-color: var(--other-month);
     opacity: 0.3;
+    cursor: default !important;
 }
 
 .today {

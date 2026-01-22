@@ -243,7 +243,7 @@
 }
 
 .weekendRow {
-    background-color: var(--calendar-weekend, #f5f7fa) !important;
+    background-color: var(--calendar-weekend) !important;
 }
 
 .selectedRow.weekendRow {

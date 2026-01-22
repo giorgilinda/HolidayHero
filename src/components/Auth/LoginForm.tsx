@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'next/navigation';
 import styles from './Auth.module.css';
 
 export function LoginForm() {
@@ -10,6 +11,15 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signIn, signInWithGoogle } = useAuth();
+  const searchParams = useSearchParams();
+
+  // Check for error from OAuth callback
+  useEffect(() => {
+    const errorParam = searchParams?.get('error');
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam));
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +39,12 @@ export function LoginForm() {
     setLoading(true);
     try {
       await signInWithGoogle();
-    } catch (err) {
-      setError('Failed to sign in with Google');
+      // If successful, the page will redirect to Google OAuth
+      // Don't reset loading here - let the redirect happen
+      // If there's an error, it will be caught below
+    } catch (err: any) {
+      console.error('Google sign-in error:', err);
+      setError(err?.message || 'Failed to sign in with Google. Please check your browser console for details.');
       setLoading(false);
     }
   };

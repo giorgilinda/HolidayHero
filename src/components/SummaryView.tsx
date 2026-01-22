@@ -19,7 +19,7 @@ interface SummaryViewProps {
   onBulkEdit: () => void;
   onBulkDelete: () => void;
   onNavigateToDay: (date: Date) => void;
-  familyId?: string;
+  familyId?: string; // Optional family ID for multi-family support
 }
 
 type DayType = 'vacation' | 'wfh' | 'bridge' | 'mandatory' | 'activity' | 'with-issue';

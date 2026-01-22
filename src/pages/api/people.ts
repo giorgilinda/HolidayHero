@@ -62,36 +62,15 @@ export default async function handler(
     // Get authenticated client (if token provided) or fallback to default
     const client = createAuthenticatedClient(req) || supabase;
     
-    // Get family_id from query parameter, authenticated user, or default
+    // Get family_id from query parameter or authenticated user
     let familyId = req.query.family_id as string;
     if (!familyId) {
       familyId = await getFamilyIdFromRequest(req, undefined, true) || '';
       
       if (!familyId) {
-        // Fallback to default family (for backward compatibility)
-        const defaultFamilyName = process.env.DEFAULT_FAMILY_NAME || 'default';
-        const { data: existingFamily } = await client
-          .from('families')
-          .select('id')
-          .eq('name', defaultFamilyName)
-          .maybeSingle();
-        
-        if (existingFamily) {
-          familyId = existingFamily.id;
-        } else {
-          const { data: newFamily, error } = await client
-            .from('families')
-            .insert({ name: defaultFamilyName })
-            .select('id')
-            .single();
-          
-          if (error || !newFamily) {
-            return res.status(500).json({ 
-              error: `Failed to initialize family: ${error?.message || 'Unknown error'}` 
-            });
-          }
-          familyId = newFamily.id;
-        }
+        return res.status(403).json({ 
+          error: 'No family found. Please create or join a family first.' 
+        });
       }
     }
 

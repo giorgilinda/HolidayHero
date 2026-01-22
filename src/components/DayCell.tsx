@@ -52,7 +52,6 @@ export const DayCell: React.FC<DayCellProps> = ({
         className
       )}
       onClick={isValidDay ? onClick : undefined}
-      style={{ cursor: isValidDay ? 'pointer' : 'default' }}
     >
       {isValidDay ? (
         <>

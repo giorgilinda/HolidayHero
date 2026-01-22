@@ -37,7 +37,7 @@ After running the migration, you need to seed your database with data from `peop
 1. Go to Supabase Dashboard → **Table Editor** → `people`
 2. Click **Insert** → **Insert row**
 3. For each person in your `people.json`, add a row with:
-   - `family_id`: UUID of your default family (get from `families` table)
+   - `family_id`: UUID of your family (get from `families` table)
    - `person_id`: The person's ID (e.g., "mom", "dad", "leon")
    - `name`: The person's name
    - `is_child`: true/false

@@ -27,6 +27,9 @@
   --color-success: #10b981;
   --color-success-light: #34d399;
   --color-success-dark: #059669;
+  --success-background: #efe;
+  --success-text: #0a0;
+  --success-border: #10b981;
 
   /* Warning/Alert */
   --color-warning: #f59e0b;
@@ -167,6 +170,8 @@
   /* Button Colors */
   --button-primary: #1a73e8;
   --button-primary-hover: #1557b0;
+  --button-disabled: #ccc;
+  --button-disabled-text: #999;
 
   /* Calendar Day Cell Sizes */
   --calendar-day-cell-size: 120px;

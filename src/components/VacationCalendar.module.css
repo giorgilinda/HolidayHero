@@ -235,3 +235,77 @@
         padding: 0 var(--space-xxs);
     }
 }
+
+.loadingIndicator {
+    font-size: 0.6em;
+    margin-left: var(--space-sm);
+}
+
+.userInfo {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.userEmail {
+    font-size: 0.9em;
+    color: var(--ui-text-secondary);
+}
+
+.signOutButton {
+    font-size: 0.85em;
+    padding: var(--space-xs) var(--space-sm);
+}
+
+.errorMessage {
+    padding: var(--space-sm);
+    margin: var(--space-sm);
+    background-color: var(--error-background);
+    color: var(--error-text);
+    border-radius: var(--radius-sm);
+}
+
+.inviteCodeContainer {
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.inviteCodeButton {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.inviteCodeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.inviteCodeDisplay {
+    background: var(--color-background-alt);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--color-border);
+    user-select: all;
+    cursor: text;
+}
+
+.copyButton,
+.shareButton {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+}
+
+.copyButton:active,
+.shareButton:active {
+    transform: scale(0.95);
+}

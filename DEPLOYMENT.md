@@ -84,10 +84,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
 #### Optional Variables:
 
-```
-DEFAULT_FAMILY_NAME=default
-```
-
 **Important:** 
 - Set these for **Production**, **Preview**, and **Development** environments
 - After adding variables, you need to **redeploy** for them to take effect

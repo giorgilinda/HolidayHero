@@ -162,17 +162,14 @@ npm install @supabase/supabase-js
 
 ## 🔐 Multi-Family Support
 
-Currently, the app uses a default family. To support multiple families:
+The app supports multiple families through authentication. Each user must belong to at least one family:
 
-### Option 1: Query Parameter (Simple)
-Add `?family_id=your-family-id` to API calls. You can get family IDs from the `families` table.
+1. Users authenticate via Supabase Auth
+2. The `user_families` table links users to families
+3. Family ID is automatically retrieved from the authenticated user's session
+4. Users can create new families or join existing ones using invite codes
 
-### Option 2: Authentication (Recommended for Production)
-1. Enable Supabase Auth in your project
-2. Create a `user_families` table to link users to families
-3. Get family_id from the authenticated user's session
-
-Example query parameter usage:
+For API testing, you can use a query parameter:
 ```
 GET /api/overrides?family_id=123e4567-e89b-12d3-a456-426614174000
 ```

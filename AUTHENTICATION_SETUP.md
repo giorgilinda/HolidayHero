@@ -58,15 +58,59 @@ This migration fixes the trigger function to properly handle family creation and
 
 ### 3. Configure Email Authentication
 
-1. In your Supabase dashboard, go to **Authentication** → **Providers**
-2. Find **Email** provider (should be enabled by default)
-3. Configure email settings:
-   - **Enable email confirmations**: Recommended for production
-   - **Enable email change confirmations**: Recommended
+1. **Configure Email Provider**:
+   - In your Supabase dashboard, go to **Authentication** → **Providers**
+   - Find **Email** provider (should be enabled by default)
+   - Click on it to open the Email provider settings panel
+   - Configure email settings:
+     - **Enable Email provider**: Should be ON (green toggle)
+     - **Secure email change**: Recommended to enable
+     - **Secure password change**: Optional
+     - **Minimum password length**: Set to 6 or more (recommended 8+)
+     - **Password Requirements**: Configure as needed
+   - Click **Save**
+
+2. **Configure Email Confirmation** (Important!):
+   - In your Supabase dashboard, go to **Authentication** → **Sign In / Providers** (or **Authentication** → **Settings**)
+   - Look for the **"User Signups"** section
+   - Find the **"Confirm email"** toggle:
+     - **For development/testing**: You can **disable** this to allow immediate signup without email confirmation
+     - **For production**: **Enable** this for security (recommended)
+   - **Note**: If disabled, users are immediately authenticated and family linking happens right away
+   - **Note**: If enabled, users must confirm their email before they can sign in, and family linking happens after confirmation
+   - Click **Save changes** at the bottom
+
+3. **Configure URL Settings**:
+   - Go to **Authentication** → **URL Configuration**
    - **Site URL**: Your app URL (e.g., `http://localhost:3000` for dev, `https://yourdomain.com` for production)
-4. Configure email templates (optional):
+   - **Redirect URLs**: Add your app URLs (e.g., `http://localhost:3000`, `https://yourdomain.com`)
+   - Click **Save**
+
+4. **Configure Email Templates** (optional):
    - Go to **Authentication** → **Email Templates**
    - Customize the confirmation, password reset, and magic link emails
+
+5. **Important for Development**: 
+   - **Supabase's default email service has limitations**:
+     - Very low rate limits (typically 2 emails per hour)
+     - Only sends to team member emails by default
+     - Not suitable for production use
+   - **If email confirmations are enabled but you're not receiving emails**:
+     - **Option 1 (Recommended for testing)**: Disable "Confirm email" temporarily
+       - Go to **Authentication** → **Sign In / Providers** → **User Signups**
+       - Toggle "Confirm email" to OFF
+       - Click "Save changes"
+       - Users will be immediately authenticated after signup
+     - **Option 2**: Manually confirm users for testing
+       - Go to **Authentication** → **Users**
+       - Find the unconfirmed user
+       - Click on the user
+       - Click "Confirm email" button (or "Send confirmation email" if available)
+     - **Option 3**: Check email delivery
+       - Check your spam/junk folder
+       - Check Supabase dashboard → **Logs** → **Auth** for email sending errors
+       - Verify the email address is correct
+   - **For production**: Set up custom SMTP (see troubleshooting section below)
 
 ### 4. Update Environment Variables
 
@@ -118,6 +162,51 @@ These should already be set from the initial Supabase setup.
 - **`overrides`**: Calendar overrides (scoped by family_id)
 - **`people`**: Family members (scoped by family_id)
 - **`family_preferences`**: Family settings (scoped by family_id)
+
+## 🔧 Troubleshooting Email Issues
+
+### Email Not Being Sent
+
+If you're not receiving confirmation emails, here are the most common causes and solutions:
+
+1. **Supabase Default Email Service Limitations**:
+   - Supabase's built-in email service has very restrictive rate limits (typically 2 emails per hour)
+   - It may only send to team member emails
+   - **Solution for development**: Disable "Confirm email" temporarily (see step 5 above)
+   - **Solution for production**: Set up custom SMTP (see below)
+
+2. **Check Auth Logs**:
+   - Go to **Supabase Dashboard** → **Logs** → **Auth**
+   - Look for errors related to email sending
+   - Check for rate limit errors or SMTP configuration issues
+
+3. **Verify Email Settings**:
+   - Go to **Authentication** → **URL Configuration**
+   - Ensure **Site URL** is set correctly (e.g., `http://localhost:3000` for dev)
+   - Ensure **Redirect URLs** includes your app URL
+
+4. **Set Up Custom SMTP (For Production)**:
+   - Go to **Authentication** → **Settings** → **SMTP Settings**
+   - Configure with a reliable email provider:
+     - **SendGrid**: Free tier available, good for production
+     - **Mailgun**: Free tier available
+     - **AWS SES**: Very reliable, pay-as-you-go
+     - **Resend**: Modern email API, developer-friendly
+   - Enter SMTP credentials (host, port, username, password, sender email)
+   - Test the configuration
+   - **Note**: Custom SMTP is required for production use
+
+5. **Manual User Confirmation (For Testing)**:
+   - Go to **Authentication** → **Users**
+   - Find the unconfirmed user
+   - Click on the user to open details
+   - Look for "Confirm email" or "Send confirmation email" button
+   - Or use the SQL Editor to manually confirm:
+     ```sql
+     UPDATE auth.users 
+     SET email_confirmed_at = NOW() 
+     WHERE email = 'user@example.com';
+     ```
 
 ## 🛠️ Troubleshooting
 

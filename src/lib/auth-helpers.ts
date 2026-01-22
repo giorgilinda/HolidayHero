@@ -30,7 +30,8 @@ function createClientFromRequest(req: NextApiRequest) {
 
 /**
  * Get the authenticated user's family ID from request
- * Returns the first family the user belongs to, or creates a new one
+ * Returns the first family the user belongs to, or null if no family exists
+ * Users must create or join a family through the UI - no auto-creation
  */
 export async function getUserFamilyIdFromRequest(req: NextApiRequest): Promise<string | null> {
   try {
@@ -54,33 +55,18 @@ export async function getUserFamilyIdFromRequest(req: NextApiRequest): Promise<s
       .select('family_id')
       .eq('user_id', user.id)
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (userFamily) {
-      return userFamily.family_id;
-    }
-
-    // If no family exists, create one
-    if (familyError && familyError.code === 'PGRST116') {
-      const familyName = user.email?.split('@')[0] || `user_${user.id.slice(0, 8)}`;
-      
-      const { data: newFamily, error: createError } = await supabaseClient
-        .from('families')
-        .insert({ name: familyName })
-        .select('id')
-        .single();
-
-      if (createError || !newFamily) {
-        console.error('Failed to create family:', createError);
+    if (familyError) {
+      // If no family found (PGRST116), return null - user must create/join a family
+      if (familyError.code === 'PGRST116') {
         return null;
       }
-
-      // The trigger should auto-add the user as owner
-      return newFamily.id;
+      console.error('Error fetching user family:', familyError);
+      return null;
     }
 
-    console.error('Error fetching user family:', familyError);
-    return null;
+    return userFamily?.family_id || null;
   } catch (error) {
     console.error('Error in getUserFamilyIdFromRequest:', error);
     return null;
@@ -89,7 +75,8 @@ export async function getUserFamilyIdFromRequest(req: NextApiRequest): Promise<s
 
 /**
  * Get family ID from request (for Pages Router API routes)
- * Falls back to query parameter or authenticated user's family
+ * Returns query parameter or authenticated user's family, or null if not found
+ * No default family fallback - users must have a real family
  */
 export async function getFamilyIdFromRequest(
   req: NextApiRequest,
@@ -103,40 +90,10 @@ export async function getFamilyIdFromRequest(
 
   // Otherwise, get from authenticated user
   if (useAuth) {
-    const familyId = await getUserFamilyIdFromRequest(req);
-    if (familyId) {
-      return familyId;
-    }
+    return await getUserFamilyIdFromRequest(req);
   }
 
-  // Fallback: create/get default family (for backward compatibility)
-  // This should only happen if auth is disabled or user has no family
-  if (!supabase) {
-    return null;
-  }
-
-  const defaultFamilyName = process.env.DEFAULT_FAMILY_NAME || 'default';
-  
-  const { data: existingFamily } = await supabase
-    .from('families')
-    .select('id')
-    .eq('name', defaultFamilyName)
-    .maybeSingle();
-  
-  if (existingFamily) {
-    return existingFamily.id;
-  }
-  
-  const { data: newFamily, error } = await supabase
-    .from('families')
-    .insert({ name: defaultFamilyName })
-    .select('id')
-    .single();
-  
-  if (error || !newFamily) {
-    return null;
-  }
-  
-  return newFamily.id;
+  // No fallback - return null if no family found
+  return null;
 }
 

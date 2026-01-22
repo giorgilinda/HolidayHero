@@ -85,7 +85,7 @@ export const useManualOverrides = (initialHolidaysData: HolidaysData | null, fam
       }
     };
     loadOverrides();
-  }, [familyId, getFamilyId]);
+  }, [familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   // Auto-generate overrides for school holidays
   useEffect(() => {
@@ -237,7 +237,7 @@ export const useManualOverrides = (initialHolidaysData: HolidaysData | null, fam
     };
     
     saveOverrides();
-  }, [manualOverrides, isOverridesLoaded, familyId, getFamilyId]);
+  }, [manualOverrides, isOverridesLoaded, familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   const handleSaveOverride = (override: ManualOverride) => {
     setManualOverrides(prev => {

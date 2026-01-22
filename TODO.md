@@ -1,0 +1,11 @@
+- add tests
+- functionality to remove account
+- functionality to disable family member
+- functionality to remove and rename family
+- vacation planner
+- save public/school holidays in db and retrieve them from there when available to avoid un-necessary call to the API (and avoid issue in case the API is down)
+- export calendar to google?
+- update next.js?
+- update documentation and clean up
+- refactor, review and cleanup code
+- add logic to find long weekend vacation with mimal days to take off (e.g.: taking only 1 day, I can have 5 days vacation)

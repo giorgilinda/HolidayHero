@@ -86,7 +86,7 @@ export const usePeople = (familyId?: string) => {
     };
 
     fetchPeople();
-  }, [familyId, getFamilyId]);
+  }, [familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   return { people, preferences, isLoading, error };
 };

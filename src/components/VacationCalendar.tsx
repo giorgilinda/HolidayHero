@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import classNames from "classnames";
 import styles from './VacationCalendar.module.css';
 import { MonthlyView } from './MonthlyView';
@@ -12,6 +12,7 @@ import { useManualOverrides } from '@/hooks/useManualOverrides';
 import { THEME_COLORS, THEME_SPACING } from '@/utils/themeConstants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { supabaseClient } from '@/lib/supabase-client';
 
 export const VacationCalendar = () => {
   const now = new Date();
@@ -40,21 +41,103 @@ export const VacationCalendar = () => {
   const { getFamilyId, user, signOut } = useAuth();
   const router = useRouter();
   const [familyId, setFamilyId] = useState<string | undefined>(undefined);
+  const [familyInviteCode, setFamilyInviteCode] = useState<string | null>(null);
+  const [showInviteCode, setShowInviteCode] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const fetchedFamilyIdRef = useRef<string | null>(null);
 
-  // Load family ID from auth
+  // Load family ID and invite code
   useEffect(() => {
-    const loadFamilyId = async () => {
-      if (user) {
-        const id = await getFamilyId();
-        setFamilyId(id || undefined);
+    if (!user) {
+      setFamilyId(undefined);
+      setFamilyInviteCode(null);
+      fetchedFamilyIdRef.current = null;
+      return;
+    }
+    
+    getFamilyId().then(id => {
+      if (!id) return;
+      
+      setFamilyId(id);
+      
+      // Fetch invite code if we haven't fetched it for this family yet
+      if (id !== fetchedFamilyIdRef.current) {
+        fetchedFamilyIdRef.current = id;
+        
+        supabaseClient
+          .from('families')
+          .select('invite_code')
+          .eq('id', id)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('Error loading invite code:', error);
+              setFamilyInviteCode(null);
+            } else if (data?.invite_code) {
+              setFamilyInviteCode(data.invite_code.trim());
+            } else {
+              setFamilyInviteCode(null);
+            }
+          });
       }
-    };
-    loadFamilyId();
+    });
   }, [user, getFamilyId]);
 
   const handleSignOut = async () => {
     await signOut();
     router.push('/auth/login');
+  };
+
+  const handleCopyInviteCode = async () => {
+    if (!familyInviteCode) return;
+    
+    try {
+      await navigator.clipboard.writeText(familyInviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy invite code:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = familyInviteCode;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (fallbackErr) {
+        console.error('Fallback copy failed:', fallbackErr);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handleShareInviteCode = async () => {
+    if (!familyInviteCode) return;
+
+    const shareData = {
+      title: 'Join my family on HolidayHero',
+      text: `Join my family on HolidayHero! Use invite code: ${familyInviteCode}`,
+      url: `${window.location.origin}/auth/signup?invite=${familyInviteCode}`,
+    };
+
+    try {
+      // Check if Web Share API is available
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to copy
+        await handleCopyInviteCode();
+      }
+    } catch (err) {
+      // User cancelled or error occurred - fallback to copy
+      if ((err as Error).name !== 'AbortError') {
+        await handleCopyInviteCode();
+      }
+    }
   };
 
   // Get manual overrides management
@@ -253,7 +336,7 @@ export const VacationCalendar = () => {
           </button>
           <h2 className={styles.monthTitle}>
             {viewMode === 'yearly' || viewMode === 'summary' ? yearString : monthString}
-            {isLoadingHolidays && <span style={{ fontSize: '0.6em', marginLeft: '8px' }}>Loading...</span>}
+            {isLoadingHolidays && <span className={styles.loadingIndicator}>Loading...</span>}
           </h2>
         </div>
         <div className={styles.viewButtonsContainer}>
@@ -333,29 +416,62 @@ export const VacationCalendar = () => {
           </button>
         </div>
         {user && (
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.9em', color: THEME_COLORS.uiTextSecondary }}>
+          <div className={styles.userInfo}>
+            <span className={styles.userEmail}>
               {user.email}
             </span>
+            {familyId && (
+              <div className={styles.inviteCodeContainer}>
+                <button
+                  onClick={() => setShowInviteCode(!showInviteCode)}
+                  className={`${styles.navButton} ${styles.inviteCodeButton}`}
+                  title="Show family invite code"
+                >
+                  {showInviteCode ? 'Hide' : 'Show'} Invite Code
+                </button>
+                {showInviteCode && (
+                  <div className={styles.inviteCodeWrapper}>
+                    {familyInviteCode ? (
+                      <>
+                        <div className={styles.inviteCodeDisplay}>
+                          {familyInviteCode}
+                        </div>
+                        <button
+                          onClick={handleCopyInviteCode}
+                          className={`${styles.navButton} ${styles.copyButton}`}
+                          title="Copy invite code to clipboard"
+                        >
+                          {copied ? '✓ Copied' : 'Copy'}
+                        </button>
+                        <button
+                          onClick={handleShareInviteCode}
+                          className={`${styles.navButton} ${styles.shareButton}`}
+                          title="Share invite code"
+                        >
+                          Share
+                        </button>
+                      </>
+                    ) : (
+                      <div className={styles.inviteCodeDisplay} style={{ color: 'var(--ui-text-secondary)', fontStyle: 'italic', fontSize: '0.8rem' }}>
+                        No invite code available
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             <button
               onClick={handleSignOut}
-              className={styles.navButton}
+              className={`${styles.navButton} ${styles.signOutButton}`}
               aria-label="Sign out"
               title="Sign out"
-              style={{ fontSize: '0.85em', padding: '4px 8px' }}
             >
               Sign Out
             </button>
           </div>
         )}
       {holidaysError && (
-        <div style={{ 
-          padding: THEME_SPACING.sm, 
-          margin: THEME_SPACING.sm, 
-          backgroundColor: THEME_COLORS.errorBackground, 
-          color: THEME_COLORS.errorText, 
-          borderRadius: '4px' 
-        }}>
+        <div className={styles.errorMessage}>
           Error loading holidays: {holidaysError}
         </div>
       )}
