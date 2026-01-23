@@ -178,6 +178,46 @@
     -webkit-box-orient: vertical;
 }
 
+.vacationOpportunity {
+    margin-top: var(--space-xs);
+    padding: var(--space-xs) var(--space-xs);
+    background-color: var(--calendar-vacation-opportunity-bg, #e8f5e9);
+    border: 1px solid var(--calendar-vacation-opportunity-border, #4caf50);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    font-size: var(--font-size-xs);
+    line-height: 1.3;
+}
+
+.vacationOpportunityIcon {
+    font-size: var(--font-size-xs);
+    flex-shrink: 0;
+}
+
+.vacationOpportunityText {
+    color: var(--calendar-vacation-opportunity-text, #2e7d32);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-weight: 500;
+}
+
+.vacationOpportunityDay {
+    border: 2px solid var(--calendar-vacation-opportunity-border, #4caf50) !important;
+    box-shadow: 0 0 0 1px var(--calendar-vacation-opportunity-bg, #e8f5e9);
+}
+
+.vacationOpportunityDay:hover {
+    border-color: var(--calendar-vacation-opportunity-border-hover, #388e3c) !important;
+    box-shadow: 0 0 0 2px var(--calendar-vacation-opportunity-bg, #e8f5e9);
+}
+
 /* Tag-based background colors */
 .SKIP {
     background-color: var(--holiday);

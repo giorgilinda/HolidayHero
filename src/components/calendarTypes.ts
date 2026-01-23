@@ -17,6 +17,12 @@ export interface DayData {
   isBridgeDay: boolean;
   schoolStatus: 'open' | 'closed' | 'half-day';
   manualOverride?: ManualOverride;
+  vacationOpportunity?: {
+    ptoDaysCount: number;
+    totalVacationDays: number;
+    efficiency: number;
+    description: string;
+  };
 }
 
 export interface CalendarDay {

@@ -189,6 +189,12 @@
   --calendar-wfh-suggestion-bg: #e0f2fe;
   --calendar-wfh-suggestion-border: #0ea5e9;
   --calendar-wfh-suggestion-text: #0c4a6e;
+  
+  /* Vacation Opportunities */
+  --calendar-vacation-opportunity-bg: #e8f5e9;
+  --calendar-vacation-opportunity-border: #4caf50;
+  --calendar-vacation-opportunity-border-hover: #388e3c;
+  --calendar-vacation-opportunity-text: #2e7d32;
 
   /* Yearly View Sizes */
   --yearly-header-height-desktop: 40px;

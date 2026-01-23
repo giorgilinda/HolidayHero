@@ -6,6 +6,9 @@ import { Person } from './DayEditDialog';
 import { DayData, ManualOverride, PersonConfig } from './calendarTypes';
 import { calculateDayRating, DayContext, DayRating } from '@/utils/brain';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useVacationOpportunities } from '@/hooks/useVacationOpportunities';
+import { VacationOpportunities } from './VacationOpportunities';
+import { VacationOpportunity } from '@/utils/vacationOpportunities';
 
 interface SummaryViewProps {
   currentYear: number;
@@ -59,6 +62,8 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
 }) => {
   const userPreferences = useUserPreferences(familyId);
   const [activeFilter, setActiveFilter] = useState<FilterType>('need-attention');
+  const vacationOpportunities = useVacationOpportunities(currentYear, dayDataMap);
+  
   const summaryData = useMemo(() => {
     const allDays: DaySummary[] = [];
     const personStats: PersonStats[] = people.map(p => ({
@@ -349,9 +354,22 @@ export const SummaryView: React.FC<SummaryViewProps> = ({
     return selectedDates.has(dateString);
   };
 
+  const handleOpportunityClick = (opportunity: VacationOpportunity) => {
+    // Navigate to the first PTO day in monthly view
+    if (opportunity.ptoDays.length > 0) {
+      onNavigateToDay(opportunity.ptoDays[0]);
+    }
+  };
+
   return (
     <div className={styles.summaryContainer}>
       <h2 className={styles.title}>Vacation Summary for {currentYear}</h2>
+
+      {/* Vacation Opportunities */}
+      <VacationOpportunities
+        opportunities={vacationOpportunities}
+        onOpportunityClick={handleOpportunityClick}
+      />
 
       {/* Person Statistics Table */}
       {summaryData.personStats.length > 0 && (

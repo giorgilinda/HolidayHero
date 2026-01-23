@@ -46,6 +46,7 @@ export const DayCell: React.FC<DayCellProps> = ({
         calendarDay.dayData?.manualOverride && 
           Object.values(calendarDay.dayData.manualOverride.people).includes('activity') &&
           dayCellStyles.manualOverrideActivity,
+        calendarDay.dayData?.vacationOpportunity && dayCellStyles.vacationOpportunityDay,
         compact && dayCellStyles.compact,
         isSelected && dayCellStyles.selected,
         selectionMode && dayCellStyles.selectionMode,
@@ -93,6 +94,14 @@ export const DayCell: React.FC<DayCellProps> = ({
                   <span className={dayCellStyles.wfhSuggestionIcon}>💡</span>
                   <span className={dayCellStyles.wfhSuggestionText}>
                     {calendarDay.rating.wfhSuggestion.reason}
+                  </span>
+                </div>
+              )}
+              {calendarDay.dayData?.vacationOpportunity && (
+                <div className={dayCellStyles.vacationOpportunity}>
+                  <span className={dayCellStyles.vacationOpportunityIcon}>🎯</span>
+                  <span className={dayCellStyles.vacationOpportunityText}>
+                    {calendarDay.dayData.vacationOpportunity.ptoDaysCount} PTO = {calendarDay.dayData.vacationOpportunity.totalVacationDays} days
                   </span>
                 </div>
               )}

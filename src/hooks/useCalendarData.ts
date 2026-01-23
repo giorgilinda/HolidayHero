@@ -2,6 +2,7 @@ import { useMemo, useEffect, useState } from 'react';
 import { fetchAllHolidays, getHolidayName, PublicHoliday, SchoolHoliday } from '@/services/openHolidaysApi';
 import { HOLIDAY_COUNTRY_CODE, HOLIDAY_LANGUAGE_CODE, HOLIDAY_SUBDIVISION_CODE } from '@/utils/constants';
 import { DayData, ManualOverride } from '@/components/calendarTypes';
+import { findVacationOpportunities } from '@/utils/vacationOpportunities';
 
 export const useCalendarData = (
   currentYear: number,
@@ -32,8 +33,10 @@ export const useCalendarData = (
           validFrom = firstDay.toISOString().split('T')[0];
           validTo = lastDay.toISOString().split('T')[0];
         } else {
-          const firstDay = new Date(currentYear, currentMonth, 1);
-          const lastDay = new Date(currentYear, currentMonth + 1, 0);
+          // For monthly view, fetch a wider range (previous month to next month)
+          // to detect vacation opportunities that span across months
+          const firstDay = new Date(currentYear, currentMonth - 1, 1);
+          const lastDay = new Date(currentYear, currentMonth + 2, 0); // Last day of next month
           validFrom = firstDay.toISOString().split('T')[0];
           validTo = lastDay.toISOString().split('T')[0];
         }
@@ -70,8 +73,10 @@ export const useCalendarData = (
         firstDay = new Date(currentYear, 0, 1);
         lastDay = new Date(currentYear, 11, 31);
       } else {
-        firstDay = new Date(currentYear, currentMonth, 1);
-        lastDay = new Date(currentYear, currentMonth + 1, 0);
+        // For monthly view, we fetch wider range but only process current month for display
+        // However, we need the wider range to calculate opportunities correctly
+        firstDay = new Date(currentYear, currentMonth - 1, 1);
+        lastDay = new Date(currentYear, currentMonth + 2, 0);
       }
       
       // Add all days in the range to the map initially
@@ -139,79 +144,62 @@ export const useCalendarData = (
         }
       });
 
-      // Detect bridge days
-      for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
+      // Mark bridge days and vacation opportunities
+      // This replaces the old bridge day detection logic and is more comprehensive:
+      // - Considers both public and school holidays
+      // - Handles more patterns (not just Friday/Monday)
+      // - Stores opportunity data for display
+      const opportunities = findVacationOpportunities(currentYear, map);
+      
+      // Create a map of date strings to opportunities for quick lookup
+      const opportunityMap = new Map<string, typeof opportunities[0]>();
+      opportunities.forEach(opp => {
+        opp.ptoDays.forEach(ptoDate => {
+          const year = ptoDate.getFullYear();
+          const month = String(ptoDate.getMonth() + 1).padStart(2, '0');
+          const day = String(ptoDate.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          // Store the opportunity with highest efficiency if multiple exist
+          const existing = opportunityMap.get(dateStr);
+          if (!existing || opp.efficiency > existing.efficiency) {
+            opportunityMap.set(dateStr, opp);
+          }
+        });
+      });
+      
+      // Mark bridge days and store opportunity data
+      opportunityMap.forEach((opportunity, dateStr) => {
         const existing = map.get(dateStr);
-
-        if (existing?.isPublicHoliday) continue;
-
-        const dayOfWeek = d.getDay();
-        const isFriday = dayOfWeek === 5;
-        const isMonday = dayOfWeek === 1;
-
-        if (!isFriday && !isMonday) continue;
-
-        let hasHolidayNearby = false;
-
-        if (isFriday) {
-          const prevDate = new Date(d);
-          prevDate.setDate(prevDate.getDate() - 1);
-          const prevYear = prevDate.getFullYear();
-          const prevMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
-          const prevDayNum = String(prevDate.getDate()).padStart(2, '0');
-          const prevDateStr = `${prevYear}-${prevMonth}-${prevDayNum}`;
-          const prevDay = map.get(prevDateStr);
-          
-          const nextMonday = new Date(d);
-          nextMonday.setDate(nextMonday.getDate() + 3);
-          const nextMondayYear = nextMonday.getFullYear();
-          const nextMondayMonth = String(nextMonday.getMonth() + 1).padStart(2, '0');
-          const nextMondayDay = String(nextMonday.getDate()).padStart(2, '0');
-          const nextMondayStr = `${nextMondayYear}-${nextMondayMonth}-${nextMondayDay}`;
-          const nextMondayDayData = map.get(nextMondayStr);
-
-          hasHolidayNearby = prevDay?.isPublicHoliday === true || nextMondayDayData?.isPublicHoliday === true;
-        }
-
-        if (isMonday) {
-          const prevFriday = new Date(d);
-          prevFriday.setDate(prevFriday.getDate() - 3);
-          const prevFridayYear = prevFriday.getFullYear();
-          const prevFridayMonth = String(prevFriday.getMonth() + 1).padStart(2, '0');
-          const prevFridayDay = String(prevFriday.getDate()).padStart(2, '0');
-          const prevFridayStr = `${prevFridayYear}-${prevFridayMonth}-${prevFridayDay}`;
-          const prevFridayDayData = map.get(prevFridayStr);
-          
-          const nextDate = new Date(d);
-          nextDate.setDate(nextDate.getDate() + 1);
-          const nextYear = nextDate.getFullYear();
-          const nextMonth = String(nextDate.getMonth() + 1).padStart(2, '0');
-          const nextDayNum = String(nextDate.getDate()).padStart(2, '0');
-          const nextDateStr = `${nextYear}-${nextMonth}-${nextDayNum}`;
-          const nextDay = map.get(nextDateStr);
-
-          hasHolidayNearby = prevFridayDayData?.isPublicHoliday === true || nextDay?.isPublicHoliday === true;
-        }
-
-        if (hasHolidayNearby) {
-          const dayData: DayData = existing || {
+        
+        // Only mark as bridge day if it's not already a public holiday
+        if (existing && !existing.isPublicHoliday) {
+          map.set(dateStr, {
+            ...existing,
+            isBridgeDay: true,
+            vacationOpportunity: {
+              ptoDaysCount: opportunity.ptoDaysCount,
+              totalVacationDays: opportunity.totalVacationDays,
+              efficiency: opportunity.efficiency,
+              description: opportunity.description,
+            },
+          });
+        } else if (!existing) {
+          // Create new entry if it doesn't exist
+          map.set(dateStr, {
             date: dateStr,
             holidayName: undefined,
             isPublicHoliday: false,
             isBridgeDay: true,
             schoolStatus: 'open',
-          };
-          
-          map.set(dateStr, {
-            ...dayData,
-            isBridgeDay: true,
+            vacationOpportunity: {
+              ptoDaysCount: opportunity.ptoDaysCount,
+              totalVacationDays: opportunity.totalVacationDays,
+              efficiency: opportunity.efficiency,
+              description: opportunity.description,
+            },
           });
         }
-      }
+      });
     }
 
     // Apply manual overrides
