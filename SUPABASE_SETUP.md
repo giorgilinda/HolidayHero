@@ -68,6 +68,32 @@ This creates:
 
 **Important**: See `AUTHENTICATION_SETUP.md` for complete authentication setup instructions, including Google OAuth configuration.
 
+#### Migration 4-7: Additional Features
+Run migrations 004-007 in order:
+- `004_fix_family_creation_trigger.sql` - Fixes family creation triggers
+- `005_allow_family_search.sql` - Enables family search functionality
+- `006_add_family_invite_codes.sql` - Adds invite code system for families
+- `007_add_unique_family_name_constraint.sql` - Prevents duplicate family names
+
+#### Migration 8: Holidays Cache (Recommended)
+1. Create a new query in SQL Editor
+2. Copy and paste the contents of `supabase/migrations/008_add_holidays_cache.sql`
+3. Click "Run"
+4. You should see "Success. No rows returned"
+
+This creates:
+- `holidays_cache` table - stores public and school holidays locally
+- Indexes for fast holiday lookups by country, date range, and type
+- Row Level Security policies - public read access (holidays are public data)
+
+**Benefits of Holidays Cache:**
+- ⚡ **Faster Performance**: Reduces external API calls by caching holidays locally
+- 🛡️ **Reliability**: App continues working even if the external holiday API is down
+- 💰 **Cost Savings**: Fewer API calls reduce rate limiting issues
+- 🔄 **Automatic Caching**: Holidays are automatically cached when fetched from the API
+
+The cache works transparently - the first request fetches from the external API and caches the results. Subsequent requests use the cached data. If the external API fails, the app automatically falls back to cached data.
+
 ### 4. Set Up Authentication
 
 Before using the app, you need to set up authentication. See `AUTHENTICATION_SETUP.md` for detailed instructions on:
@@ -157,6 +183,19 @@ npm install @supabase/supabase-js
 - `id` (SERIAL) - Primary key
 - `family_id` (UUID) - Foreign key to families (unique)
 - `max_mandatory_days_for_wfh_suggestion` (INTEGER) - Threshold for WFH suggestions
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+### Holidays Cache Table
+- `id` (SERIAL) - Primary key
+- `country_code` (TEXT) - ISO country code (e.g., 'DE', 'US')
+- `subdivision_code` (TEXT, nullable) - Regional subdivision code (e.g., 'DE-BY')
+- `language_code` (TEXT) - Language for holiday names (default: 'EN')
+- `holiday_type` (TEXT) - Either 'public' or 'school'
+- `holiday_id` (TEXT) - Unique ID from external API
+- `start_date` (DATE) - Holiday start date
+- `end_date` (DATE) - Holiday end date
+- `holiday_data` (JSONB) - Complete holiday object from API
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 

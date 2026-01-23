@@ -15,6 +15,7 @@ school closures, and WFH flexibility to find the best days for PTO.
 - **School Holiday Detection**: Integrates school holiday calendars
 - **Childcare Guard**: Automatically flags days where school is closed (mandatory PTO)
 - **Bridge Day Finder**: Detects high-efficiency days where 1 PTO = 4 Day Weekend
+- **Holidays Cache**: Local database caching reduces API calls and provides fallback when external API is unavailable
 
 ### 🏠 Work-From-Home Suggestions
 - **WFH Recommendations**: Suggests WFH when school is closed, kids can stay home, and mandatory days are below threshold
@@ -284,6 +285,14 @@ See `DEPLOYMENT.md` for detailed deployment instructions.
 - Multi-year planning
 - Integration with work calendar systems
 - Push notifications for upcoming holidays
+
+## 📚 Additional Documentation
+
+- **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)** - Complete Supabase setup guide including holidays cache
+- **[HOLIDAYS_CACHE.md](./HOLIDAYS_CACHE.md)** - Detailed holidays caching feature documentation
+- **[AUTHENTICATION_SETUP.md](./AUTHENTICATION_SETUP.md)** - Authentication and OAuth configuration
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deployment guide for Vercel and other platforms
+- **[MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)** - Guide for migrating from local storage to Supabase
 
 ## 📄 License
 
