@@ -86,6 +86,7 @@ export const usePeople = (familyId?: string) => {
     };
 
     fetchPeople();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   return { people, preferences, isLoading, error };

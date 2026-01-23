@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { getFamilyIdFromRequest } from "@/lib/auth-helpers";
 
@@ -16,7 +17,6 @@ function createAuthenticatedClient(req: NextApiRequest) {
   const token = authHeader.replace('Bearer ', '');
   
   // Create a new client with the token
-  const { createClient } = require('@supabase/supabase-js');
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

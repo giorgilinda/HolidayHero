@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { getFamilyIdFromRequest } from "@/lib/auth-helpers";
 
@@ -14,7 +15,6 @@ function createAuthenticatedClient(req: NextApiRequest) {
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const { createClient } = require('@supabase/supabase-js');
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -85,18 +85,18 @@ export default async function handler(
         // are the way to join private families
         
         // Try using RPC function first (bypasses RLS)
-        let rpcFamily = null;
-        let rpcError = null;
+        let rpcFamily: Family[] | null = null;
+        let rpcError: { message: string } | null = null;
         
         try {
           const rpcResult = await client.rpc('find_family_by_invite_code', {
             invite_code_param: inviteCode.trim()
           });
-          rpcFamily = rpcResult.data;
+          rpcFamily = rpcResult.data as Family[] | null;
           rpcError = rpcResult.error;
-        } catch (err: any) {
+        } catch (err) {
           // RPC function might not exist yet (migration not run)
-          console.warn('RPC function not available or error:', err?.message || err);
+          console.warn('RPC function not available or error:', err instanceof Error ? err.message : String(err));
           rpcError = { message: 'RPC function not available' };
         }
         

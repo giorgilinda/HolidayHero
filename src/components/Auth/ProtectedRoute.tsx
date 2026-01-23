@@ -64,6 +64,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   if (loading || checkingFamily) {

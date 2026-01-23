@@ -1,9 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { SignupForm } from '@/components/Auth/SignupForm';
 
 export default function SignupPage() {
-  return <SignupForm />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupForm />
+    </Suspense>
+  );
 }
 

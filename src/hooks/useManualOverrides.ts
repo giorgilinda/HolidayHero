@@ -4,10 +4,11 @@ import { Person } from '@/components/DayEditDialog';
 import { usePeople } from './usePeople';
 import { supabaseClient } from '@/lib/supabase-client';
 import { useAuth } from '@/contexts/AuthContext';
+import { PublicHoliday, SchoolHoliday } from '@/services/openHolidaysApi';
 
 interface HolidaysData {
-  publicHolidays: any[];
-  schoolHolidays: any[];
+  publicHolidays: PublicHoliday[];
+  schoolHolidays: SchoolHoliday[];
 }
 
 export const useManualOverrides = (initialHolidaysData: HolidaysData | null, familyId?: string) => {
@@ -85,6 +86,7 @@ export const useManualOverrides = (initialHolidaysData: HolidaysData | null, fam
       }
     };
     loadOverrides();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   // Auto-generate overrides for school holidays
@@ -237,6 +239,7 @@ export const useManualOverrides = (initialHolidaysData: HolidaysData | null, fam
     };
     
     saveOverrides();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manualOverrides, isOverridesLoaded, familyId]); // Removed getFamilyId from dependencies to prevent infinite loop
 
   const handleSaveOverride = (override: ManualOverride) => {

@@ -2,6 +2,21 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabase";
 import peopleConfig from '@/config/people.json';
 
+interface PersonConfig {
+  id: string;
+  name: string;
+  isChild?: boolean;
+  availability?: boolean;
+  wfhAbility?: boolean;
+}
+
+interface PeopleConfig {
+  people: PersonConfig[];
+  preferences?: {
+    maxMandatoryDaysForWfhSuggestion?: number;
+  };
+}
+
 /**
  * Migration endpoint to seed people data from people.json into the database
  * 
@@ -51,7 +66,8 @@ export default async function handler(
     }
 
     // Transform people.json data to database format
-    const peopleRows = (peopleConfig as any).people.map((person: any) => ({
+    const config = peopleConfig as PeopleConfig;
+    const peopleRows = config.people.map((person) => ({
       family_id: familyId,
       person_id: person.id,
       name: person.name,
@@ -72,7 +88,7 @@ export default async function handler(
     }
 
     // Insert preferences
-    const preferences = (peopleConfig as any).preferences || {};
+    const preferences = config.preferences || {};
     const { error: prefsError } = await supabase
       .from('family_preferences')
       .upsert({

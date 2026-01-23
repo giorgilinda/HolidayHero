@@ -75,7 +75,7 @@ export async function fetchPublicHolidays(
       throw new Error(data.error);
     }
     
-    return data.map((holiday: any) => ({
+    return data.map((holiday: Holiday) => ({
       ...holiday,
       type: 'public' as const,
     }));
@@ -135,7 +135,7 @@ export async function fetchSchoolHolidays(
       throw new Error(data.error);
     }
     
-    return data.map((holiday: any) => ({
+    return data.map((holiday: Holiday) => ({
       ...holiday,
       type: 'school' as const,
     }));

@@ -533,7 +533,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Check if family name already exists (case-insensitive)
         // Try multiple approaches to catch duplicates
-        let existingFamily = null;
+        let existingFamily: { id: string; name: string } | null = null;
         
         // First, try a direct case-insensitive search
         const { data: directMatch, error: directError } = await supabaseClient

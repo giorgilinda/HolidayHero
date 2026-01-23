@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState } from 'react';
-import { fetchAllHolidays, getHolidayName } from '@/services/openHolidaysApi';
+import { fetchAllHolidays, getHolidayName, PublicHoliday, SchoolHoliday } from '@/services/openHolidaysApi';
 import { HOLIDAY_COUNTRY_CODE, HOLIDAY_LANGUAGE_CODE, HOLIDAY_SUBDIVISION_CODE } from '@/utils/constants';
 import { DayData, ManualOverride } from '@/components/calendarTypes';
 
@@ -10,8 +10,8 @@ export const useCalendarData = (
   manualOverrides: Map<string, ManualOverride>
 ) => {
   const [holidaysData, setHolidaysData] = useState<{
-    publicHolidays: any[];
-    schoolHolidays: any[];
+    publicHolidays: PublicHoliday[];
+    schoolHolidays: SchoolHoliday[];
   } | null>(null);
   const [isLoadingHolidays, setIsLoadingHolidays] = useState(false);
   const [holidaysError, setHolidaysError] = useState<string | null>(null);

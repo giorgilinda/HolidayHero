@@ -13,7 +13,7 @@ const config = [
   ...compat.extends("next/core-web-vitals"),
   {
     rules: {
-      "react/react-in-jsx-scope": "error",
+      "react/react-in-jsx-scope": "off", // Next.js 13+ uses automatic JSX runtime
     },
   },
 ];

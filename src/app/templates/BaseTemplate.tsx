@@ -2,7 +2,7 @@
 
 import React from "react";
 import styles from "./BaseTemplate.module.css";
-import { APP_NAME, APP_EMOJI } from "../../utils/constants";
+import { APP_NAME, APP_EMOJI } from "@/utils/constants";
 
 const BaseTemplate = (props: { children: React.ReactNode }) => {
   return (

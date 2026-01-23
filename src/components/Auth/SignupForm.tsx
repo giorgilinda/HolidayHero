@@ -164,9 +164,9 @@ export function SignupForm() {
       // If successful, the page will redirect to Google OAuth
       // Don't reset loading here - let the redirect happen
       // If there's an error, it will be caught below
-    } catch (err: any) {
+    } catch (err) {
       console.error('Google sign-in error:', err);
-      setError(err?.message || 'Failed to sign in with Google. Please check your browser console for details.');
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google. Please check your browser console for details.');
       setLoading(false);
     }
   };
